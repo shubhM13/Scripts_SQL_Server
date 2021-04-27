@@ -9,22 +9,16 @@ AS
 (
 		SELECT A.[interactionId]
 			,B.[observationId] AS observationId
-			,ISNULL(A.[interactionStatus], '') AS interactionStatus
-			,ISNULL(A.[interactionStatusTxt], '') AS interactionStatusTxt
-			,ISNULL(A.[interactionType], '') AS interactionType
-			,ISNULL(A.[interactionTypeTxt], '') AS interactionTypeTxt
+			,ISNULL(A.[interactionStatusTxt], '') AS interactionStatus
+			,ISNULL(A.[interactionTypeTxt], '') AS interactionType
 			,ISNULL(B.[observationEntityId], '') AS entityId
 			,ISNULL(A.[interactionOrganisationId], '') AS interactionOrganisationId
 			,ISNULL(A.[interactionOrgName], '') AS interactionOrgName
 			,ISNULL(A.[interactionEmployeeId], '') AS interactionEmployeeId
-			,ISNULL(A.[interactionPersonId], '') AS interactionPersonId
 			,ISNULL(A.[agronomistEmail], '') AS agronomistEmail
 			,ISNULL(A.[interactionTemplateId], '') AS interactionTemplateId
-			--,ISNULL(A.[interactionEventId], '') AS interactionEventId               [drop]
 			,A.[interactionStartDate] AS interactionStartDate
 			,A.[startDateKey] AS startDateKey
-			,A.[interaction_modifiedOn] AS interactionModifiedOn
-			,A.[interaction_modifiedOnKey] AS interactionModifiedOnKey
 			,B.[obsDate] AS obsDate
 			,B.[obsDateKey] AS obsDateKey
 			,ISNULL(B.[observationCriteriaId], '') AS observationCriteriaId
@@ -39,16 +33,13 @@ AS
 			,B.[answerDate2Key] AS answerDate2Key
 			,B.[answerNumber] AS answerNumber
 			,B.answerText AS answerText
-			,ISNULL(B.[answerCode], '') AS answerCode
 			,ISNULL(B.[answerCodeTxt], '') AS answerCodeTxt
 			,B.[answerCodeScore] AS answerCodeScore
 			,ISNULL(B.[multiListAnswerCode], '') AS multiListAnswerCode
 			,ISNULL(B.[multiListAnswerCodeTxt], '') AS multiListAnswerCodeTxt
 			,B.[multiListAnswerCodeScore] AS multiListAnswerCodeScore
-			,ISNULL(B.[unitOfMeasure], '') AS unitOfMeasure
-			,ISNULL(B.[unitOfMeasureTxt], '') AS unitOfMeasureTxt
-			,ISNULL(B.[currencyCode], '') AS currencyCode
-			,ISNULL(B.[currencyCodeTxt], '') AS currencyCodeTxt
+			,ISNULL(B.[unitOfMeasureTxt], '') AS unitOfMeasure
+			,ISNULL(B.[currencyCodeTxt], '') AS currencyCode
 			,ISNULL(B.[isLatest], 0) AS isLatest
 			,ISNULL(B.[isLatestByYear], 0) AS isLatestByYear
 		FROM dm.dim_interaction AS A
@@ -61,7 +52,7 @@ AS
 		AND B.obsDateKey IN (select distinct dateKey from [dm].[dim_date])
 		AND A.interactionEmployeeId IN (select distinct employeeId from [dm].[dim_employee])
 		AND A.interactionOrganisationId IN (select distinct organisationId from [dwh].[CT_Organisation])
-		AND A.interactionTemplateId IN (select distinct templateId from [dm].[dim_template])
+		AND A.interactionTemplateId IN (select distinct templateId from [dm].[dim_nsp_template])
 		);
 
 -- VIew top 1000
@@ -70,9 +61,9 @@ FROM [dm].[view_fact_nsp_assessment_analysis]
 
 DROP TABLE [dm].[fact_nsp_assessment_analysis]
 
-SELECT *
-INTO [dm].[fact_nsp_assessment_analysis]
-FROM dm.view_fact_nsp_assessment_analysis;
+
+
+
 
 --ALTER TABLE [dm].[fact_nsp_assessment_analysis] ADD CONSTRAINT dimNspfactAss_pk PRIMARY KEY (interactionId, observationId);
 
