@@ -1,10 +1,10 @@
 /*******************************************
  Author     : Shubham Mishra
  Created On : 10th Feb, 2021
- PURPOSE    : EntityMaster Model
+ PURPOSE    : NSC EntityMaster Model
  *******************************************/
-DROP VIEW dm.view_entity_master;
-CREATE VIEW dm.view_entity_master
+--DROP VIEW dm.view_nsc_entity_master;
+CREATE VIEW dm.view_nsc_entity_master
 AS
 (
 		SELECT DISTINCT A.entityId AS entityId
@@ -55,12 +55,13 @@ AS
 			,ISNULL(D.cluster_name, '') AS cluster_name
 			,ISNULL(D.country_name, '') AS country_name
 		FROM [dwh].[ET_Entity] AS A WITH (NOLOCK)
+		INNER JOIN dm.dim_geonode_flat AS D WITH (NOLOCK) ON A.geoNodeId = D.geoNodeId
+			AND D.cluster_lob IN ('NESCAFE', 'GLOBAL')
 		LEFT OUTER JOIN [dwh].[MT_FarmSummary] AS B WITH (NOLOCK) ON A.entityId = B.entityId
 			AND A.STATUS != 'DELETED'
 		LEFT OUTER JOIN dwh.ET_Group AS C WITH (NOLOCK) ON B.latest4CGroupId = C.groupId
 			AND C.type = 'CERTIFICATION'
 			AND C.certificationType = '4C'
-		LEFT OUTER JOIN dm.dim_geonode_flat AS D WITH (NOLOCK) ON A.geoNodeId = D.geoNodeId
 		LEFT OUTER JOIN dwh.CT_ListOption_Txt AS E WITH (NOLOCK) ON A.STATUS = E.itemCode
 			AND E.setId = 'ENTITY_STATUS'
 			AND E.LANGUAGE = 'E'
@@ -76,17 +77,19 @@ AS
 		LEFT OUTER JOIN dwh.CT_ListOption_Txt AS M WITH (NOLOCK) ON A.AAAStatus = M.itemCode
 			AND M.setId = 'AAA_LEVEL'
 			AND M.LANGUAGE = 'E'
-		)
-GO;
+		);
 
+drop table [dm].[dim_nsc_entity_master];
 SELECT
   *
-INTO [dm].[dim_entity_master]
-FROM [dm].[view_entity_master];
+INTO [dm].[dim_nsc_entity_master]
+FROM [dm].[view_nsc_entity_master];
 
+drop table dm.dim_entity_master
 
-ALTER TABLE [dm].[dim_entity_master]
-ADD CONSTRAINT entiyMaster_pk PRIMARY KEY (entityId);
+ALTER TABLE [dm].[dim_nsc_entity_master]
+ADD CONSTRAINT nscEntiyMaster_pk PRIMARY KEY (entityId);
 
 select COUNT(*) from [dm].[dim_entity_master]
+select top(10)* from [dm].[dim_entity_master];
 

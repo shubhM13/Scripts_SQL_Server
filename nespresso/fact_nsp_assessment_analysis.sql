@@ -61,10 +61,6 @@ FROM [dm].[view_fact_nsp_assessment_analysis]
 
 DROP TABLE [dm].[fact_nsp_assessment_analysis]
 
-
-
-
-
 --ALTER TABLE [dm].[fact_nsp_assessment_analysis] ADD CONSTRAINT dimNspfactAss_pk PRIMARY KEY (interactionId, observationId);
 
 SELECT COUNT(*)
