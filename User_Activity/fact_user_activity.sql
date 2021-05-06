@@ -31,9 +31,9 @@ AS
 				   ON CAST(FORMAT(cast(L.LAST_SUCCESSFUL_CONNECT AS DATE), 'yyyyMMdd') AS INT) = M.DateKey
 				 ) AS P
 				 where P.rnk = 1) AS D ON A.userName = D.USER_NAME
-		--[dwh].[SYS_USERS_HISTORY] AS D ON A.userName = D.[USER_NAME]
 		AND D.LAST_SUCCESSFUL_CONNECT IS NOT NULL
 		AND D.USER_NAME IS NOT NULL
+		AND D.LAST_SUCCESSFUL_CONNECT >= Convert(datetime, '2021-04-01' )
 		);
 
 select count(userName) from dm.view_user_activity;
