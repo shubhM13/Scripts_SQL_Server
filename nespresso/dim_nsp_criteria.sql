@@ -10,11 +10,11 @@ AS
 		SELECT DISTINCT A.criteriaId AS criteriaId
 						,ISNULL(A.externalId, '') AS criteriaCode
 						,ISNULL(A.status, '') AS criteriaStatus
-						,ISNULL(A.classification1, '') AS criteriaClassification1
-						,ISNULL(A.classification2, '') AS criteriaClassification2
-						,ISNULL(A.classification3, '') AS criteriaClassification3
+						,ISNULL(E.label, '') AS criteriaClassification1
+						,ISNULL(F.label, '') AS criteriaClassification2
+						,ISNULL(G.label, '') AS criteriaClassification3
 						,CAST(ISNULL(A.complianceFlag, 0) AS BIT) AS criteriaComplianceFlag
-						,ISNULL(A.answerType, '') AS criteriaAnswerType
+						,ISNULL(D.label, '') AS criteriaAnswerType
 						,CASE 
 							WHEN C.title IS NOT NULL
 							THEN C.title
@@ -30,10 +30,6 @@ AS
 							THEN C.longDescription
 							ELSE B.longDescription
 							END AS criteriaLongDescription
-						,ISNULL(D.label, '') AS criteriaAnswerTypeTxt
-						,ISNULL(E.label, '') AS classification1Txt
-						,ISNULL(F.label, '') AS classification2Txt
-						,ISNULL(G.label, '') AS classification3Txt
 		FROM dwh.AT_Criteria AS A
 		LEFT JOIN (
 			SELECT * FROM

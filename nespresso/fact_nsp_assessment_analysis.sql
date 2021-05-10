@@ -32,7 +32,7 @@ AS
 			,B.[answerDate2] AS answerDate2
 			,B.[answerDate2Key] AS answerDate2Key
 			,B.[answerNumber] AS answerNumber
-			,B.answerText AS answerText
+			,ISNULL(B.answerText, '') AS answerText
 			,ISNULL(B.[answerCodeTxt], '') AS answerCodeTxt
 			,B.[answerCodeScore] AS answerCodeScore
 			,ISNULL(B.[multiListAnswerCode], '') AS multiListAnswerCode
@@ -57,33 +57,36 @@ AS
 
 -- VIew top 1000
 SELECT TOP(1000) *
-FROM [dm].[view_fact_nsp_assessment_analysis]
+FROM [dm].[view_fact_nsp_assessment_analysis];
 
-DROP TABLE [dm].[fact_nsp_assessment_analysis]
+select *
+into [dm].[fact_nsp_assessment_analysis]
+from [dm].[view_fact_nsp_assessment_analysis];
+
+DROP TABLE [dm].[fact_nsp_assessment_analysis];
 
 --ALTER TABLE [dm].[fact_nsp_assessment_analysis] ADD CONSTRAINT dimNspfactAss_pk PRIMARY KEY (interactionId, observationId);
 
 SELECT COUNT(*)
-FROM [dm].[view_fact_nsp_assessment_analysis]
+FROM [dm].[view_fact_nsp_assessment_analysis];
 
 SELECT COUNT(*)
-FROM [dm].[dim_nsp_observation]
+FROM [dm].[fact_nsp_assessment_analysis];
 
 SELECT COUNT(*)
-FROM [dm].[fact_nsp_assessment_analysis]
-
-
+FROM [dm].[fact_nsp_assessment_analysis];
+ 
 
 select distinct A.lineOfBusiness from [dwh].[CT_Organisation] AS A
 INNER JOIN [dm].[fact_nsp_assessment_analysis] AS B ON A.organisationId = B.interactionOrganisationId
-where A.lineOfBusiness NOT IN ('NESPRESSO', 'GLOBAL')
+where A.lineOfBusiness NOT IN ('NESPRESSO', 'GLOBAL');
 
 --LoB of Geonodes of entites
 select A.lineOfBusiness, COUNT(distinct C.entityId)
 from [dwh].[CT_GeoNode] AS A
 INNER JOIN [dwh].[ET_Entity] AS B ON A.geoNodeId = B.geoNodeId
 INNER JOIN [dm].[fact_nsp_assessment_analysis] AS C ON B.entityId = C.entityId
-group By A.lineOfBusiness
+group By A.lineOfBusiness;
 
 --LoB of Organisation
 select A.lineOfBusiness, COUNT(distinct B.interactionOrganisationId)

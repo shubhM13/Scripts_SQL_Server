@@ -1,27 +1,31 @@
+/****** Object:  View [dm].[view_nsp_template]    Script Date: 10/05/2021 9:21:52 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 18th April, 2021
  PURPOSE    : DimTemplate 
  *******************************************/
---drop view dm.view_nsp_template
-CREATE VIEW dm.view_nsp_template
+--drop view dm.view_dim_nsp_template
+CREATE VIEW [dm].[view_dim_nsp_template]
 AS
 (
 		SELECT DISTINCT A.templateId AS templateId
-			,ISNULL(A.STATUS, '') AS templateStatus
-			,ISNULL(A.type, '') AS templateType
+			,ISNULL(E.label, '') AS templateStatus
+			,ISNULL(C.label, '') AS templateType
 			,CAST(ISNULL(A.applyToAllGeoNodes, 0) AS BIT) AS templateApplyToAllGeoNodes
 			,CAST(ISNULL(A.applyToAllOrgs, 0) AS BIT) AS templateApplyToAllOrgs
-			,ISNULL(A.activityType, '') AS templateActivityType
+			,ISNULL(D.label, '') AS templateActivityType
 			,CAST(ISNULL(A.applyToAllSuppliers, 0) AS BIT) AS templateApplyToAllSuppliers
 			,CAST(ISNULL(A.applyToAllPartners, 0) AS BIT) AS templateApplyToAllPartners
 			,CAST(ISNULL(A.applyToAllCertPartners, 0) AS BIT) AS templateApplyToAllCertPartners
 			,A.organisationId
 			,ISNULL(B.title, '') AS templateTitle
 			,ISNULL(B.description, '') AS templateDescription
-			,ISNULL(C.label, '') AS templateTypeTxt
-			,ISNULL(D.label, '') AS activityTypeTxt
-			,ISNULL(E.label, '') AS templateStatusTxt
 			,F.lineOfBusiness
 		FROM dwh.AT_Template AS A
 		LEFT JOIN dwh.AT_Template_Txt AS B ON A.templateId = B.templateId
@@ -34,24 +38,9 @@ AS
 			AND E.itemCode = A.STATUS
         LEFT JOIN dwh.CT_Organisation AS F ON A.organisationId = F.organisationId
         WHERE A.organisationId NOT LIKE '%NESCAFE%'
-		OR A.organisationId IS NULL
+	    AND A.organisationId IS NOT NULL
 		AND A.templateId NOT LIKE '%NESCAFE%'
 		);
+GO
 
-DROP TABLE [dm].[dim_nsp_template]
 
-SELECT *
-INTO [dm].[dim_nsp_template]
-FROM dm.view_nsp_template;
-
-ALTER TABLE [dm].[dim_nsp_template] ADD CONSTRAINT dimNspTemplate_pk PRIMARY KEY (templateId);
-
-SELECT COUNT(*)
-FROM [dm].[dim_nsp_template]
-
-SELECT COUNT(*)
-FROM dm.view_nsp_template;
-
-select * from  [dm].[fact_nsp_assessment_analysis] where interactionTemplateId NOT IN (select templateId from [dm].[dim_nsp_template])
-
-select * from dwh.AT_Template where templateId = '580503D231779114E10000000A4E71D5'
