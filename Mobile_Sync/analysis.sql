@@ -142,6 +142,7 @@ select A."userName" AS "User Name"
        ,E."lineOfBusiness" AS "Line Of Business"
        ,D."contactInfo.email" AS "Employee Email"
        ,CONCAT(CONCAT(D."personInfo.firstName",' '), D."personInfo.lastName") AS "Employee Name"
+       ,TO_VARCHAR(TO_DATE(A."SyncStartTime"), 'DD-MM-YYYY') AS "Sync Start Date"
        ,A."SyncInProgressTime" AS "Sync In-Progress Time"
        ,A."SyncStartTime" AS "Sync Start Time"
        ,A."SyncEndTime" AS "Sync End Time"
@@ -215,7 +216,8 @@ select
        ,E."lineOfBusiness" AS "Line Of Business"
        ,D."contactInfo.email" AS "Employee Email"
        ,CONCAT(CONCAT(D."personInfo.firstName",' '), D."personInfo.lastName") AS "Employee Name"
-       , C."auditInfo.createdOn" AS "Device Log Time"     
+       ,TO_VARCHAR(TO_DATE(C."auditInfo.createdOn"), 'DD-MM-YYYY') AS "Device Log Date" 
+       ,C."auditInfo.createdOn" AS "Device Log Time"     
        ,C."platform" AS "Device Platform"
        ,C."model" AS "Device Model"
        ,C."osVersion" AS "OS Version"
@@ -236,6 +238,7 @@ select
        ,E."lineOfBusiness" AS "Line Of Business"
        ,D."contactInfo.email" AS "Employee Email"
        ,CONCAT(CONCAT(D."personInfo.firstName",' '), D."personInfo.lastName") AS "Employee Name"
+       ,TO_VARCHAR(TO_DATE(B."logTime"), 'DD-MM-YYYY') AS "Log Date" 
        ,B.*
 from "FARMS"."nestle.dev.glb.farms.data.structure::CT.AppLog" AS B
 LEFT OUTER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.Employee" AS D
@@ -243,4 +246,10 @@ ON B."userName" = D."userName"
 LEFT OUTER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.Organisation" AS E
 ON D."organisationId" = E."organisationId"
 WHERE YEAR(B."logTime") = 2021
-AND D."userName" <> 'FARMS_TECH';
+AND D."userName" <> 'FARMS_TECH'
+LIMIT 1000 OFFSET 17000;
+
+select count(*) 
+from "FARMS"."nestle.dev.glb.farms.data.structure::CT.AppLog"
+WHERE YEAR("logTime") = 2021
+AND "userName" <> 'FARMS_TECH'

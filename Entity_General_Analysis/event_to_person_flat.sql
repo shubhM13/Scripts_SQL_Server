@@ -4,8 +4,8 @@
  Created On : 4th May
  PURPOSE    : Entity General Analysis 
  *******************************************/
- --drop view dm.view_event_to_person_flat;
-CREATE VIEW dm.view_event_to_person_flat
+ --drop view dm.view_dim_event_to_person_flat;
+CREATE VIEW dm.view_dim_event_to_person_flat
 AS
 (
 		SELECT DISTINCT a.eventId
@@ -20,3 +20,10 @@ AS
 		FROM [dwh].[IT_EventToPerson] AS a
 		GROUP BY eventId
 	);
+
+drop table dm.dim_event_to_person_flat;
+
+select * into dm.dim_event_to_person_flat
+from dm.view_dim_event_to_person_flat;
+
+ALTER TABLE dm.dim_event_to_person_flat ADD CONSTRAINT dimEventToPerson_pk PRIMARY KEY (eventId);
