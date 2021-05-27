@@ -3,8 +3,8 @@
  Created On : 25th March
  PURPOSE    : User Activity Model
  *******************************************/
---drop view dm.view_user_activity;
-CREATE VIEW dm.view_user_activity
+--drop view dm.view_fact_user_activity;
+CREATE VIEW dm.view_fact_user_activity
 AS
 (
 		SELECT  A.userName

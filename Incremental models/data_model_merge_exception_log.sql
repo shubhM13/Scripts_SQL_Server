@@ -1,3 +1,4 @@
+/****** Object:  Table [AUDIT].[data_model_merge_error_log]    Script Date: 27-05-2021 03:29:20 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -13,14 +14,10 @@ CREATE TABLE [AUDIT].[data_model_merge_error_log](
 	[Tablename] [nvarchar](500) NULL,
 	[ErrorSeverity] [int] NULL,
 	[ErrorState] [int] NULL,
-	[DateErrorRaised] [datetime] NULL
-)
+	[DateErrorRaised] [datetime] NULL,
+	[pipeline_name] [varchar](100) NULL,
+	[run_id] [varchar](100) NULL
+) ON [PRIMARY]
 GO
-
-ALTER TABLE [AUDIT].[data_model_merge_error_log]
-ADD [pipeline_name] [varchar](100) NULL,
-	[run_id] [varchar](100) NULL;
-
-select * from [AUDIT].[data_model_merge_error_log];
 
 

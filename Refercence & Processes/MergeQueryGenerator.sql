@@ -1,4 +1,4 @@
-DROP PROCEDURE [dm].[GenerateMergeSQL] 
+DROP PROCEDURE [dm].[GenerateMergeSQL];
 CREATE PROCEDURE [dm].[GenerateMergeSQL] 
 @SrcSchemaName VARCHAR(100)
 ,@SrcTableName VARCHAR(100)
@@ -106,23 +106,61 @@ BEGIN
 
 	DEALLOCATE @ColNames
 
-	SET @sql = 'SET IDENTITY_INSERT ' + @SrcSchemaName+'.'+@SrcTableName + ' ON;
-            MERGE ' + @TgtSchemaName+'.'+@TgtTableName + ' AS D
-                USING ' + @SourceDB + @SrcSchemaName+'.'+@SrcTableName + ' AS S
-                ON (D.' + @identityColName + ' = S.' + @identityColName + ')
-            WHEN NOT MATCHED BY TARGET
-                THEN INSERT(' + @DestInsertColumns + ') 
-                VALUES(' + @SourceInsertColumns + ')
-            WHEN MATCHED 
-                THEN UPDATE SET 
-                    ' + @UpdateClause + '
-            WHEN NOT MATCHED BY SOURCE
-                THEN DELETE
-            OUTPUT $action, Inserted.*, Deleted.*;
-			SELECT @@ROWCOUNT;
-            SET IDENTITY_INSERT ' + @SrcSchemaName+'.'+@SrcTableName + ' OFF'
+	SET @sql = '
+/*******************************************
+ Name 		: '+ @TgtSchemaName+'.'+ 'usp_merge_' + @TgtTableName  + '
+ Author     : Shubham Mishra
+ Created On : '+ FORMAT (getdate(), 'dd, MMM, yyyy')  +'
+ PURPOSE    : Data Model Incremental Setup
+ *******************************************/
+--drop procedure '+ @TgtSchemaName+'.'+ 'usp_merge_' + @TgtTableName +'
+CREATE PROCEDURE '+ @TgtSchemaName+'.'+ 'usp_merge_' + @TgtTableName +' @pipeline_name VARCHAR(100) NULL, @run_id VARCHAR(100) NULL
+AS
+BEGIN
+	DECLARE @ERROR_PROC VARCHAR(5000), @ROW INT
+	SET @ERROR_PROC = ''[AUDIT].[usp_insert_data_model_merge_error]''
+	BEGIN TRY
+		MERGE ' + @TgtSchemaName+'.'+@TgtTableName + ' AS D
+		USING ' + @SrcSchemaName+'.'+ 'view_' + @SrcTableName + ' AS S
+			ON (D.' + @identityColName + ' = S.' + @identityColName + ')
+		WHEN NOT MATCHED BY TARGET
+			THEN
+				INSERT (' + @DestInsertColumns + ')
+				VALUES (' + @SourceInsertColumns + ')
+		WHEN MATCHED
+			THEN
+				UPDATE
+				SET ' + @UpdateClause + '
+		WHEN NOT MATCHED BY SOURCE
+			THEN
+				DELETE
+		OUTPUT $ACTION
+			,Inserted.*
+			,Deleted.*;
+		SET @ROW = (
+				SELECT @@ROWCOUNT
+				);
+		INSERT INTO [AUDIT].[data_model_merge_log] (
+			schema_name, table_name ,last_run_ts ,last_run_status, count, pipeline_name, run_id
+			)
+		VALUES (
+			'+ '''' +@TgtSchemaName+ '''' +', ' + '''' + @TgtTableName + '''' +', CURRENT_TIMESTAMP, ''SUCCESS'', @ROW, @pipeline_name, @run_id
+			);
+	END TRY
+	BEGIN CATCH
+		EXEC @ERROR_PROC @pipeline_name = @pipeline_name
+			,@run_id = @run_id;
+		INSERT INTO [AUDIT].[data_model_merge_log] (
+			schema_name, table_name ,last_run_ts ,last_run_status, count, pipeline_name, run_id
+			)
+		VALUES (
+			'+ '''' +@TgtSchemaName+ '''' +', ' + '''' + @TgtTableName + '''' +', CURRENT_TIMESTAMP, ''FAIL'', NULL, @pipeline_name, @run_id
+			);
+	END CATCH
+END 
+GO'
 
 	PRINT @SQL
-END
+END;
 
-EXEC [dm].[GenerateMergeSQL] 'dm', 'dim_entity_master', 'dm', 'dim_entity_master'
+EXEC [dm].[GenerateMergeSQL] 'dm', 'fact_employee_mobile_sync_analysis', 'dm', 'fact_employee_mobile_sync_analysis';
