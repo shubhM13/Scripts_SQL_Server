@@ -1,3 +1,4 @@
+/****** Object:  View [dm].[view_nsp_geonode_flat]    Script Date: 31/05/2021 1:36:20 AM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -5,13 +6,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 23rd March, 2021
  PURPOSE    : Nespresso Dataset
  *******************************************/
---drop view [dm].[view_nsp_geonode_flat]
-CREATE VIEW [dm].[view_nsp_geonode_flat]
+--drop view [dm].[view_dim_nsp_geonode_flat]
+CREATE VIEW [dm].[view_dim_nsp_geonode_flat]
 AS
 	SELECT E.geoNodeId AS geoNodeId
 		,E.geoNodeType AS type
@@ -103,14 +105,4 @@ AS
 		AND I.geoNodeType = 'GLOBAL';
 GO
 
-select distinct lineOfBusiness from dwh.CT_GeoNode
-select * from [dm].[view_nsp_geonode_flat] where type = 'GLOBAL'
 
-drop table [dm].[dim_nsp_entity_master]
-SELECT
-  *
-INTO [dm].[dim_nsp_geonode_flat]
-FROM [dm].[view_nsp_geonode_flat];
-
-ALTER TABLE [dm].[dim_nsp_geonode_flat]
-ADD CONSTRAINT nspGeoFlat_pk PRIMARY KEY (geoNodeId);

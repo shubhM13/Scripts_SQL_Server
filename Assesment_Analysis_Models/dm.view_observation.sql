@@ -1,90 +1,53 @@
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
- Created On : 12th April, 2021
- PURPOSE    : Delivery Nespresso Dataset
+ Created On : 17th Feb, 2021
+ PURPOSE    : DimObservation
  *******************************************/
---drop view dm.view_fact_nsp_delivery
-CREATE VIEW dm.view_fact_nsp_delivery
+--drop view [dm].[view_dim_observation]
+CREATE VIEW [dm].[view_dim_observation]
 AS
 (
-		SELECT DISTINCT A.[deliveryNumber]
-			,A.[deliveryId]
-			,A.[commodityType]
-			,A.[entityId]
-			,A.[deliveryDate]
-			,CAST(FORMAT(cast(A.[deliveryDate] AS DATE), 'yyyyMMdd') AS INT) AS deliveryDateKey
-			,A.[deliveredQuantity]
-			,A.[deliveredUnit] AS deliveredUnit1
-			,A.[purchasingPoint]
-			,A.[pointOfPurchaseCode]
-			,A.[invoiceNumber]
-			,A.[purchaseExchangeRateVsUSD]
-			,A.[coffeeState]
-			,A.[purchaseBasePrice]
-			,A.[purchaseCurrency]
-			,A.[purchaseNNTotal]
-			,A.[coffeeSpecie]
-			,A.[location]
-			,A.[premiumCurrency]
-			,A.[physicalQuality]
-			,A.[purchaseCertified]
-			,A.[harvestPeriod]
-			,A.[purchaseAAAPremium]
-			,A.[cupQuality]
-			,A.[purchaseDate]
-			,CAST(FORMAT(cast(A.[purchaseDate] AS DATE), 'yyyyMMdd') AS INT) AS purchaseDateKey
-			,A.[purchaseBENPremium]
-			,A.[purchaseExchangePremiumRateVsUSD]
-			,A.[status]
-			,CASE 
-				WHEN A.[purchaseExchangeRateVsUSD] IS NULL
-					OR A.[purchaseExchangeRateVsUSD] = 0
-					THEN A.[purchaseBasePrice]
-				ELSE A.[purchaseBasePrice] / A.[purchaseExchangeRateVsUSD]
-				END AS purchaseBaseprice_USD
-			,CASE 
-				WHEN A.[purchaseExchangeRateVsUSD] IS NULL
-					OR A.[purchaseExchangeRateVsUSD] = 0
-					THEN A.[purchaseNNTotal]
-				ELSE A.[purchaseNNTotal] / A.[purchaseExchangeRateVsUSD]
-				END AS purchaseNNTotal_USD
-			,CASE 
-				WHEN A.[purchaseExchangeRateVsUSD] IS NULL
-					OR A.[purchaseExchangeRateVsUSD] = 0
-					THEN A.[purchaseAAAPremium]
-				ELSE A.[purchaseAAAPremium] / A.[purchaseExchangeRateVsUSD]
-				END AS purchaseAAAPremium_USD
-			,CASE 
-				WHEN A.[purchaseExchangeRateVsUSD] IS NULL
-					OR A.[purchaseExchangeRateVsUSD] = 0
-					THEN A.[purchaseBENPremium]
-				ELSE A.[purchaseBENPremium] / A.[purchaseExchangeRateVsUSD]
-				END AS purchaseBENPremium_USD
-			,B.[geoNodeId]
-			,C.[CONV_FACT]
-			,CASE 
-				WHEN C.[CONV_FACT] IS NULL
-					THEN A.[deliveredQuantity]
-				ELSE A.[deliveredQuantity] * C.[CONV_FACT]
-				END AS deliveredQuantityKG
-		FROM [dwh].[OT_Delivery] AS A
-		INNER JOIN [dwh].[ET_Entity] AS B ON A.entityId = B.entityId
-		INNER JOIN [dwh].[MT_UOMConversion] AS C ON A.deliveredUnit = C.ALT_UOM
+		SELECT A.observationId AS observationId
+			,cast(A.obsDateTime AS DATE) AS obsDate
+			,CAST(FORMAT(cast(A.obsDateTime AS DATE), 'yyyyMMdd') AS INT) AS obsDateKey
+			,ISNULL(A.entityId, '') AS observationEntityId
+			,ISNULL(A.criteriaId, '') AS observationCriteriaId
+			,ISNULL(A.interactionId, '') AS interactionId
+			,ISNULL(CAST(A.notApplicableFlag AS BIT), 0) AS notApplicableFlag
+			,A.answerType AS answerType
+			,A.answerDate AS answerDate
+			,CAST(FORMAT(cast(A.answerDate AS DATE), 'yyyyMMdd') AS INT) AS answerDateKey
+			,A.answerDate2 AS answerDate2
+			,CAST(FORMAT(cast(A.answerDate2 AS DATE), 'yyyyMMdd') AS INT) AS answerDate2Key
+			,A.answerNumber AS answerNumber
+			,A.answerText AS answerText
+			,A.answerCode AS answerCode
+			,C.label AS answerCodeTxt
+			,C.score AS answerCodeScore
+			,D.selectedCode AS multiListAnswerCode
+			,D.answerText AS multiListAnswerCodeTxt
+			,D.answerScore AS multiListAnswerCodeScore
+			,ISNULL(A.unitOfMeasure, '') AS unitOfMeasure
+			,ISNULL(F.label, '') AS unitOfMeasureTxt
+			,ISNULL(A.currencyCode, '') AS currencyCode
+			,ISNULL(G.label, '') AS currencyCodeTxt
+			,ISNULL(CAST(A.isLatest AS BIT), 0) AS isLatest
+			,ISNULL(CAST(A.isLatestByYear AS BIT), 0) AS isLatestByYear
+		FROM dwh.AT_Observation AS A
+		LEFT JOIN [dwh].[AT_Criteria] AS B ON A.criteriaId = B.criteriaId
+		LEFT JOIN [dm].[dim_list_option] AS C ON C.setId = B.answerListSetId
+			AND C.itemCode = A.answerCode
+		LEFT JOIN [dm].[view_multiselect_answers_flat] AS D ON D.observationId = A.observationId
+		LEFT JOIN [dm].[dim_list_option] AS F ON F.setId = 'UOM'
+			AND F.itemCode = A.unitOfMeasure
+		LEFT JOIN [dm].[dim_list_option] AS G ON G.setId = 'CURRENCY_CODES'
+			AND G.itemCode = A.currencyCode
+		WHERE A.status = 'ACTIVE'
 		);
-
-
-DROP TABLE [dm].[fact_nsp_delivery]
-
-SELECT *
-INTO [dm].[fact_nsp_delivery]
-FROM dm.view_fact_nsp_delivery;
-
---ALTER TABLE [dm].[fact_nsp_delivery] ADD CONSTRAINT nspDelivery_pk PRIMARY KEY ([deliveryNumber]);
-
-SELECT COUNT(*)
-FROM [dm].[fact_nsp_delivery]
-
-SELECT COUNT(*)
-FROM dm.view_fact_nsp_delivery;
-
-select * from [dm].[fact_nsp_delivery]
+GO

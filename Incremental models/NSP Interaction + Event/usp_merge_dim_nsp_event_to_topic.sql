@@ -1,10 +1,10 @@
 /*******************************************
- Name 		: dm.usp_merge_fact_user_activity
+ Name 		: dm.usp_merge_dim_nsp_event_to_topic
  Author     : Shubham Mishra
- Created On : 26, May, 2021
+ Created On : 01, Jun, 2021
  PURPOSE    : Data Model Incremental Setup
  *******************************************/
-ALTER PROCEDURE dm.usp_merge_fact_user_activity (
+CREATE PROCEDURE dm.usp_merge_dim_nsp_event_to_topic (
 	@pipeline_name AS VARCHAR(100) = NULL
 	,@run_id AS VARCHAR(100) = NULL
 	)
@@ -16,35 +16,29 @@ BEGIN
 	SET @ERROR_PROC = '[AUDIT].[usp_insert_data_model_merge_error]'
 
 	BEGIN TRY
-		MERGE dm.fact_user_activity AS D
-		USING dm.view_fact_user_activity AS S
-			ON (D.userName = S.userName
-			AND YEAR(D.last_successful_connect_dt) = YEAR(S.last_successful_connect_dt)
-			AND MONTH(D.last_successful_connect_dt) = MONTH(S.last_successful_connect_dt))
+		MERGE dm.dim_nsp_event_to_topic AS D
+		USING dm.view_dim_nsp_event_to_topic AS S
+			ON (D.templateName = S.templateName
+			AND D.topicName = S.topicName
+			AND D.eventId = S.eventId)
 		WHEN NOT MATCHED BY TARGET
 			THEN
 				INSERT (
-					[userName]
-					,[employeeId]
-					,[last_successful_connect_ts]
-					,[last_successful_connect_dt]
-					,[date_key]
+					[eventId]
+					,[topicName]
+					,[templateName]
 					)
 				VALUES (
-					S.[userName]
-					,S.[employeeId]
-					,S.[last_successful_connect_ts]
-					,S.[last_successful_connect_dt]
-					,S.[date_key]
+					S.[eventId]
+					,S.[topicName]
+					,S.[templateName]
 					)
 		WHEN MATCHED
 			THEN
 				UPDATE
-				SET [userName] = S.[userName]
-					,[employeeId] = S.[employeeId]
-					,[last_successful_connect_ts] = S.[last_successful_connect_ts]
-					,[last_successful_connect_dt] = S.[last_successful_connect_dt]
-					,[date_key] = S.[date_key]
+				SET [eventId] = S.[eventId]
+					,[topicName] = S.[topicName]
+					,[templateName] = S.[templateName]
 		WHEN NOT MATCHED BY SOURCE
 			THEN
 				DELETE
@@ -67,7 +61,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'fact_user_activity'
+			,'dim_nsp_event_to_topic'
 			,CURRENT_TIMESTAMP
 			,'SUCCESS'
 			,@ROW
@@ -91,7 +85,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'fact_user_activity'
+			,'dim_nsp_event_to_topic'
 			,CURRENT_TIMESTAMP
 			,'FAIL'
 			,NULL
@@ -102,10 +96,5 @@ BEGIN
 END
 GO
 
-EXEC dm.usp_merge_fact_user_activity;
-truncate table dm.fact_user_activity;
-
-
-select A.* from dm.fact_user_activity AS A INNER JOIN (select userName, count(*) as count from dm.fact_user_activity group by userName) AS B ON A.userName = B.userName
-where B.count > 1
+EXEC dm.usp_merge_dim_nsp_event_to_topic;
 

@@ -1,10 +1,17 @@
+/****** Object:  View [dm].[view_template]    Script Date: 31/05/2021 1:37:35 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 11th Feb, 2021
  PURPOSE    : DimTemplate 
  *******************************************/
---drop view dm.view_template
-CREATE VIEW dm.view_template
+--drop view [dm].[view_dim_template]
+CREATE VIEW [dm].[view_dim_template]
 AS
 (
 		SELECT DISTINCT A.templateId AS templateId
@@ -32,6 +39,7 @@ AS
 		LEFT JOIN [dm].[dim_list_option] AS E ON E.setId = 'CRITERIA_STATUS'
 			AND E.itemCode = A.STATUS
 		);
+GO
 
 DROP TABLE [dm].[dim_template]
 

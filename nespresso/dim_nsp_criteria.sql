@@ -1,10 +1,17 @@
+/****** Object:  View [dm].[view_nsp_criteria]    Script Date: 31/05/2021 1:35:51 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 20th April
  PURPOSE    : DimNspCriteria 
  *******************************************/
---drop view dm.view_nsp_criteria
-CREATE VIEW dm.view_nsp_criteria
+--drop view dm.view_dim_nsp_criteria
+CREATE VIEW [dm].[view_dim_nsp_criteria]
 AS
 (
 		SELECT DISTINCT A.criteriaId AS criteriaId
@@ -56,6 +63,10 @@ AS
 			AND G.itemCode = A.classification3
 		WHERE A.criteriaId IN (select distinct observationCriteriaId from [dm].[view_fact_assessment_analysis])
 		);
+GO
+
+
+
 
 DROP TABLE [dm].[dim_nsp_criteria]
 

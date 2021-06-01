@@ -1,10 +1,10 @@
 /*******************************************
- Name 		: dm.usp_merge_fact_user_activity
+ Name 		: dm.usp_merge_dim_user
  Author     : Shubham Mishra
- Created On : 26, May, 2021
+ Created On : 27, May, 2021
  PURPOSE    : Data Model Incremental Setup
  *******************************************/
-ALTER PROCEDURE dm.usp_merge_fact_user_activity (
+ALTER PROCEDURE dm.usp_merge_dim_user (
 	@pipeline_name AS VARCHAR(100) = NULL
 	,@run_id AS VARCHAR(100) = NULL
 	)
@@ -16,35 +16,50 @@ BEGIN
 	SET @ERROR_PROC = '[AUDIT].[usp_insert_data_model_merge_error]'
 
 	BEGIN TRY
-		MERGE dm.fact_user_activity AS D
-		USING dm.view_fact_user_activity AS S
-			ON (D.userName = S.userName
-			AND YEAR(D.last_successful_connect_dt) = YEAR(S.last_successful_connect_dt)
-			AND MONTH(D.last_successful_connect_dt) = MONTH(S.last_successful_connect_dt))
+		MERGE dm.dim_user AS D
+		USING dm.view_dim_user AS S
+			ON (D.employeeId = S.employeeId)
 		WHEN NOT MATCHED BY TARGET
 			THEN
 				INSERT (
 					[userName]
+					,[organisationId]
+					,[orgName]
+					,[lineOfBusiness]
 					,[employeeId]
-					,[last_successful_connect_ts]
-					,[last_successful_connect_dt]
-					,[date_key]
+					,[employeeName]
+					,[status]
+					,[employeeEmail]
+					,[gender]
+					,[businessRole]
+					,[country]
 					)
 				VALUES (
 					S.[userName]
+					,S.[organisationId]
+					,S.[orgName]
+					,S.[lineOfBusiness]
 					,S.[employeeId]
-					,S.[last_successful_connect_ts]
-					,S.[last_successful_connect_dt]
-					,S.[date_key]
+					,S.[employeeName]
+					,S.[status]
+					,S.[employeeEmail]
+					,S.[gender]
+					,S.[businessRole]
+					,S.[country]
 					)
 		WHEN MATCHED
 			THEN
 				UPDATE
 				SET [userName] = S.[userName]
-					,[employeeId] = S.[employeeId]
-					,[last_successful_connect_ts] = S.[last_successful_connect_ts]
-					,[last_successful_connect_dt] = S.[last_successful_connect_dt]
-					,[date_key] = S.[date_key]
+					,[organisationId] = S.[organisationId]
+					,[orgName] = S.[orgName]
+					,[lineOfBusiness] = S.[lineOfBusiness]
+					,[employeeName] = S.[employeeName]
+					,[status] = S.[status]
+					,[employeeEmail] = S.[employeeEmail]
+					,[gender] = S.[gender]
+					,[businessRole] = S.[businessRole]
+					,[country] = S.[country]
 		WHEN NOT MATCHED BY SOURCE
 			THEN
 				DELETE
@@ -67,7 +82,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'fact_user_activity'
+			,'dim_user'
 			,CURRENT_TIMESTAMP
 			,'SUCCESS'
 			,@ROW
@@ -91,7 +106,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'fact_user_activity'
+			,'dim_user'
 			,CURRENT_TIMESTAMP
 			,'FAIL'
 			,NULL
@@ -102,10 +117,5 @@ BEGIN
 END
 GO
 
-EXEC dm.usp_merge_fact_user_activity;
-truncate table dm.fact_user_activity;
 
-
-select A.* from dm.fact_user_activity AS A INNER JOIN (select userName, count(*) as count from dm.fact_user_activity group by userName) AS B ON A.userName = B.userName
-where B.count > 1
-
+EXEC dm.usp_merge_dim_user;

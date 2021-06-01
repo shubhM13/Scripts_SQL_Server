@@ -1,5 +1,4 @@
-DROP PROCEDURE [dm].[GenerateMergeSQL];
-CREATE PROCEDURE [dm].[GenerateMergeSQL] 
+ALTER PROCEDURE [dm].[GenerateMergeSQL] 
 @SrcSchemaName VARCHAR(100)
 ,@SrcTableName VARCHAR(100)
 ,@TgtSchemaName VARCHAR(100)

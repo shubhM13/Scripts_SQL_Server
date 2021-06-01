@@ -1,10 +1,17 @@
+/****** Object:  View [dm].[view_list_option]    Script Date: 31/05/2021 1:34:35 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 15th Feb
  PURPOSE    : DimListOption 
  *******************************************/
---drop view dm.view_list_option
-CREATE VIEW dm.view_list_option
+--drop view [dm].[view_dim_list_option]
+CREATE VIEW [dm].[view_dim_list_option]
 AS
 (
 		SELECT DISTINCT A.setId AS setId
@@ -33,6 +40,10 @@ AS
 			AND A.itemCode = C.itemCode
 			AND C.LANGUAGE = 'E'
 		);
+GO
+
+
+
 
 DROP TABLE [dm].[dim_list_option]
 SELECT *

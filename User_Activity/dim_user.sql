@@ -36,7 +36,8 @@ SELECT *
 INTO dm.dim_user
 FROM dm.view_dim_user;
 
---ALTER TABLE dm.dim_user ADD CONSTRAINT dimUser_pk PRIMARY KEY (employeeId);
+ALTER TABLE dm.dim_user ALTER COLUMN userName varchar(100) NOT NULL;
+--ALTER TABLE dm.dim_user ADD CONSTRAINT dimUser_pk PRIMARY KEY (userName);
 
 SELECT *
 FROM dm.view_dim_user;
@@ -44,3 +45,6 @@ FROM dm.view_dim_user;
 
 SELECT *
 FROM dm.dim_user;
+
+
+EXEC dm.usp_merge_dim_user;

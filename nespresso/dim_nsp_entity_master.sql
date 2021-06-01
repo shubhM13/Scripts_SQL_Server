@@ -1,3 +1,10 @@
+/****** Object:  View [dm].[view_nsp_entity_master]    Script Date: 31/05/2021 1:36:07 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
 /*******************************************
  Author     : Shubham Mishra
  Created On : 22nd March, 2021
@@ -6,7 +13,7 @@
 
  *******************************************/
 --DROP VIEW dm.view_nsp_entity_master;
-CREATE VIEW dm.view_nsp_entity_master
+CREATE VIEW [dm].[view_dim_nsp_entity_master]
 AS
 (
 		SELECT DISTINCT A.entityId AS entityId
@@ -82,6 +89,9 @@ AS
 			AND N.setId = 'CORE_ASSESSMENT_STATUS'
 			AND N.LANGUAGE = 'E'
 		);
+GO
+
+
 
 drop table [dm].[dim_nsp_entity_master];
 

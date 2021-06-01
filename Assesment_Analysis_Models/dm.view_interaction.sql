@@ -1,10 +1,11 @@
-/*******************************************
- Author     : Shubham Mishra
- Created On : 18th Feb, 2021
- PURPOSE    : DimInteraction
- *******************************************/
---drop view dm.view_interaction
-CREATE VIEW dm.view_interaction
+/****** Object:  View [dm].[view_interaction]    Script Date: 31/05/2021 1:34:25 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+--drop view [dm].[view_interaction]
+CREATE VIEW [dm].[view_dim_interaction]
 AS
 (
 		SELECT A.interactionId
@@ -37,6 +38,10 @@ AS
 		AND A.varietyTrialId IS NULL
 		AND A.siteTrialId IS NULL
 		);
+GO
+
+
+
 
 DROP TABLE [dm].[dim_interaction]
 
