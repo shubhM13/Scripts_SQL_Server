@@ -20,7 +20,6 @@ AS
 				,ISNULL(C.country_name, 'N/A') AS country
 		FROM [dwh].[CT_Employee] AS A
 		INNER JOIN [dwh].[CT_Organisation] AS B ON A.organisationId = B.organisationId
-		AND A.userName NOT IN ('FARMS_TECH', 'P000008')
 		AND A.userName IS NOT NULL
 		LEFT JOIN [dm].[dim_geonode_flat] AS C ON A.[addressInfo.countryCode] = C.[countryCode]
 		AND C.type = 'COUNTRY'

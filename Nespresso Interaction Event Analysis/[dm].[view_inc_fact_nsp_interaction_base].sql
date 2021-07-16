@@ -1,10 +1,10 @@
 /*******************************************
  Author     : Shubham Mishra
- Created On : 2nd June, 2021
+ Created On : 30th June, 2021
  PURPOSE    : InteractionBaseFact Nespresso Dataset
  *******************************************/
---drop view dm.view_fact_nsp_interaction_base                
-CREATE VIEW [dm].[view_fact_nsp_interaction_base]
+--drop view [dm].[view_inc_fact_nsp_interaction_base]             
+CREATE VIEW [dm].[view_inc_fact_nsp_interaction_base]
 AS
 (
         SELECT DISTINCT (A.interactionId)
@@ -30,6 +30,7 @@ AS
                 'NESPRESSO'
                 ,'GLOBAL'
                 )
+			AND A.[auditInfo.modifiedOn] >= (select waterMarkVal from [AUDIT].[WaterMark] where schemaname = 'IT' and sqltablename = 'Interaction')
         INNER JOIN [dwh].[CT_Employee] AS C WITH (NOLOCK) ON A.employeeId = C.employeeId
 		INNER JOIN dwh.CT_Organisation AS X ON C.organisationId = X.organisationId
 		AND X.lineOfBusiness IN ('NESPRESSO', 'GLOBAL')
@@ -44,13 +45,8 @@ AS
         );
 GO
 
+select * from dwh.IT_Interaction where [auditInfo.modifiedOn] >= CAST('2021-06-30 01:03:03.0266667' AS DATE)
+
 select * from [dm].[fact_nsp_interaction_base];
 select * from [dm].[view_fact_nsp_interaction_base];
-
-drop table [dm].[fact_nsp_interaction_base];
-
-select *
-into [dm].[fact_nsp_interaction_base]
-from [dm].[view_fact_nsp_interaction_base];
-
-ALTER TABLE [dm].[fact_nsp_interaction_base] ADD CONSTRAINT dimNspIntBase_pk PRIMARY KEY (interactionId);
+select * from [AUDIT].[WaterMark]

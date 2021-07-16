@@ -1,11 +1,10 @@
 /*******************************************
- Name 		: dm.usp_merge_dim_nsp_event_to_topic
+ Name 		: dm.usp_merge_dim_nsp_geonode_flat
  Author     : Shubham Mishra
- Created On : 30, Jun, 2021
+ Created On : 17, Jun, 2021
  PURPOSE    : Data Model Incremental Setup
  *******************************************/
---drop procedure dm.usp_merge_dim_nsp_event_to_topic
-ALTER PROCEDURE dm.usp_merge_dim_nsp_event_to_topic (
+ALTER PROCEDURE dm.usp_merge_dim_nsp_geonode_flat (
 	@pipeline_name AS VARCHAR(100) = NULL
 	,@run_id AS VARCHAR(100) = NULL
 	)
@@ -17,24 +16,53 @@ BEGIN
 	SET @ERROR_PROC = '[AUDIT].[usp_insert_data_model_merge_error]'
 
 	BEGIN TRY
-		MERGE dm.dim_nsp_event_to_topic AS D
-		USING dm.view_dim_nsp_event_to_topic AS S
-			ON (D.topicName = S.topicName)
+		MERGE dm.dim_nsp_geonode_flat AS D
+		USING dm.view_dim_nsp_geonode_flat AS S
+			ON (D.geoNodeId = S.geoNodeId)
 		WHEN NOT MATCHED BY TARGET
 			THEN
 				INSERT (
-					[eventId]
-					,[topicName]
+					[geoNodeId]
+					,[type]
+					,[name]
+					,[status]
+					,[subCluster]
+					,[subClusterName]
+					,[cluster]
+					,[clusterName]
+					,[country]
+					,[countryName]
+					,[countryCode]
+					,[currencyCode]
 					)
 				VALUES (
-					S.[eventId]
-					,S.[topicName]
+					S.[geoNodeId]
+					,S.[type]
+					,S.[name]
+					,S.[status]
+					,S.[subCluster]
+					,S.[subClusterName]
+					,S.[cluster]
+					,S.[clusterName]
+					,S.[country]
+					,S.[countryName]
+					,S.[countryCode]
+					,S.[currencyCode]
 					)
 		WHEN MATCHED
 			THEN
 				UPDATE
-				SET [eventId] = S.[eventId]
-					,[topicName] = S.[topicName]
+				SET [type] = S.[type]
+					,[name] = S.[name]
+					,[status] = S.[status]
+					,[subCluster] = S.[subCluster]
+					,[subClusterName] = S.[subClusterName]
+					,[cluster] = S.[cluster]
+					,[clusterName] = S.[clusterName]
+					,[country] = S.[country]
+					,[countryName] = S.[countryName]
+					,[countryCode] = S.[countryCode]
+					,[currencyCode] = S.[currencyCode]
 		WHEN NOT MATCHED BY SOURCE
 			THEN
 				DELETE
@@ -57,7 +85,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'dim_nsp_event_to_topic'
+			,'dim_nsp_geonode_flat'
 			,CURRENT_TIMESTAMP
 			,'SUCCESS'
 			,@ROW
@@ -81,7 +109,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'dim_nsp_event_to_topic'
+			,'dim_nsp_geonode_flat'
 			,CURRENT_TIMESTAMP
 			,'FAIL'
 			,NULL
@@ -92,3 +120,4 @@ BEGIN
 END
 GO
 
+EXEC dm.usp_merge_dim_nsp_geonode_flat;

@@ -1,6 +1,6 @@
 /*******************************************
  Author     : Shubham Mishra
- Created On : 25rd April, 2021
+ Created On : 25th April, 2021
  PURPOSE    : Agronomist Performance
  *******************************************/
 --drop view dm.view_fact_nsc_agronomist_performance				

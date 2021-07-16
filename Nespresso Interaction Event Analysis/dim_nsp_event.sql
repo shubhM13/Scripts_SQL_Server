@@ -19,14 +19,12 @@ AS
 			,ISNULL(A.name, '') AS eventName
 			,ISNULL(J.label, '') AS interactionStatus
 			,ISNULL(H.label, '') AS eventStatus
-			,ISNULL(I.label, '') AS interactionType
 			,ISNULL(G.label, '') AS eventType
 			,CASE WHEN Q.eventId IS NULL	
 				  THEN 'No'
 				  ELSE 'Yes'
 			 END AS trainingFeedbackTaken
 			,ISNULL(B.name, '') AS eventOrgName
-			,ISNULL(A.description, '') AS eventDescription
 			,CAST(A.startDate AS DATE) AS eventStartDate
 			,CAST(A.endDate AS DATE) AS eventEndDate
 			,ISNULL(A.location, '') AS eventLocation
@@ -38,12 +36,10 @@ AS
 				  ELSE 'Yes'
 			 END AS attendanceTaken
 			,ISNULL(F.attendedCount, 0) AS attendedPersonCount 
-			,ISNULL(F.personAttended, '') AS attendees
 			,CASE WHEN R.topics IS NULL OR R.topics = ''
 			 THEN 0
 			 ELSE ISNULL(R.topicCounts, 0) 
 			 END AS topicCounts 
-			,ISNULL(R.topics, '') AS topics
 		FROM [dwh].[IT_Event] AS A
 		INNER JOIN [dwh].[CT_Organisation] AS B WITH (NOLOCK)
 			ON B.organisationId = A.organisationId

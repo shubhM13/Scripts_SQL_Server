@@ -11,19 +11,19 @@ AS
 			,B.[observationId] AS observationId
 			,ISNULL(A.[interactionStatusTxt], '') AS interactionStatus
 			,ISNULL(A.[interactionTypeTxt], '') AS interactionType
-			,ISNULL(B.[observationEntityId], '') AS entityId
-			,ISNULL(A.[interactionOrganisationId], '') AS interactionOrganisationId
+			,B.[observationEntityId] AS entityId
+			,A.[interactionOrganisationId] AS interactionOrganisationId
 			,ISNULL(A.[interactionOrgName], '') AS interactionOrgName
-			,ISNULL(A.[interactionEmployeeId], '') AS interactionEmployeeId
+			,A.[interactionEmployeeId] AS interactionEmployeeId
 			,ISNULL(A.[agronomistEmail], '') AS agronomistEmail
-			,ISNULL(A.[interactionTemplateId], '') AS interactionTemplateId
+			,A.[interactionTemplateId] AS interactionTemplateId
 			,A.[interactionStartDate] AS interactionStartDate
 			,A.[startDateKey] AS startDateKey
 			,B.[obsDate] AS obsDate
 			,B.[obsDateKey] AS obsDateKey
-			,ISNULL(B.[observationCriteriaId], '') AS observationCriteriaId
-			,ISNULL(D.groupCodes, '') AS criteriaGroupCodes
-			,ISNULL(E.topicCodes, '') AS criteriaTopicCodes
+			,B.[observationCriteriaId] AS observationCriteriaId
+			,D.groupCodes AS criteriaGroupCodes
+			,E.topicCodes AS criteriaTopicCodes
 			,ISNULL(E.topicTxts, '') AS criteriaTopicCodeTxts
 			,ISNULL(B.[notApplicableFlag], '') AS notApplicableFlag
 			,ISNULL(B.[answerType], '') AS answerType
@@ -45,7 +45,6 @@ AS
 		FROM dm.dim_interaction AS A
 		INNER JOIN dm.dim_observation AS B
 		ON A.interactionId = B.interactionId
-		INNER JOIN [dm].[dim_nsp_entity_master] AS C ON B.[observationEntityId] = C.entityId
 		LEFT JOIN [dm].[dim_criteria_group_flat] AS D ON B.observationCriteriaId = D.criteriaId
 		LEFT JOIN [dm].[dim_criteria_topic_flat] AS E ON B.observationCriteriaId = E.criteriaId
 		WHERE A.[interactionEmployeeId] NOT IN ('1104','708','697','976')
@@ -53,6 +52,7 @@ AS
 		AND A.interactionEmployeeId IN (select distinct employeeId from [dm].[dim_employee])
 		AND A.interactionOrganisationId IN (select distinct organisationId from [dwh].[CT_Organisation])
 		AND A.interactionTemplateId IN (select distinct templateId from [dm].[dim_nsp_template])
+		AND B.observationEntityId IN (select distinct entityId from dm.dim_nsp_entity_master)
 		);
 
 -- VIew top 1000
@@ -65,7 +65,7 @@ from [dm].[view_fact_nsp_assessment_analysis];
 
 DROP TABLE [dm].[fact_nsp_assessment_analysis];
 
---ALTER TABLE [dm].[fact_nsp_assessment_analysis] ADD CONSTRAINT dimNspfactAss_pk PRIMARY KEY (interactionId, observationId);
+--ALTER TABLE [dm].[fact_nsp_assessment_analysis] ADD CONSTRAINT dimNspfactAss_pk PRIMARY KEY (observationId);
 
 SELECT COUNT(*)
 FROM [dm].[view_fact_nsp_assessment_analysis];

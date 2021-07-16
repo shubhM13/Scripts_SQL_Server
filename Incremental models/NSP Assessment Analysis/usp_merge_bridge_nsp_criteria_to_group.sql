@@ -1,11 +1,11 @@
 /*******************************************
- Name 		: dm.usp_merge_dim_nsp_event_to_topic
+ Name 		: dm.usp_merge_bridge_nsp_criteria_to_group
  Author     : Shubham Mishra
- Created On : 30, Jun, 2021
+ Created On : 29, Jun, 2021
  PURPOSE    : Data Model Incremental Setup
  *******************************************/
---drop procedure dm.usp_merge_dim_nsp_event_to_topic
-ALTER PROCEDURE dm.usp_merge_dim_nsp_event_to_topic (
+--drop procedure dm.usp_merge_bridge_nsp_criteria_to_group
+CREATE PROCEDURE dm.usp_merge_bridge_nsp_criteria_to_group (
 	@pipeline_name AS VARCHAR(100) = NULL
 	,@run_id AS VARCHAR(100) = NULL
 	)
@@ -17,24 +17,34 @@ BEGIN
 	SET @ERROR_PROC = '[AUDIT].[usp_insert_data_model_merge_error]'
 
 	BEGIN TRY
-		MERGE dm.dim_nsp_event_to_topic AS D
-		USING dm.view_dim_nsp_event_to_topic AS S
-			ON (D.topicName = S.topicName)
+		MERGE dm.bridge_nsp_criteria_to_group AS D
+		USING dm.view_bridge_nsp_criteria_to_group AS S
+			ON (D.groupCode = S.groupCode
+            AND D.criteriaId = S.criteriaId)
 		WHEN NOT MATCHED BY TARGET
 			THEN
 				INSERT (
-					[eventId]
-					,[topicName]
+					[criteriaId]
+					,[groupCode]
+					,[criteriaGroupCodeTxt]
+					,[criteriaEvaluationContext]
+					,[criteriaEvaluationContextTxt]
 					)
 				VALUES (
-					S.[eventId]
-					,S.[topicName]
+					S.[criteriaId]
+					,S.[groupCode]
+					,S.[criteriaGroupCodeTxt]
+					,S.[criteriaEvaluationContext]
+					,S.[criteriaEvaluationContextTxt]
 					)
 		WHEN MATCHED
 			THEN
 				UPDATE
-				SET [eventId] = S.[eventId]
-					,[topicName] = S.[topicName]
+				SET [criteriaId] = S.[criteriaId]
+					,[groupCode] = S.[groupCode]
+					,[criteriaGroupCodeTxt] = S.[criteriaGroupCodeTxt]
+					,[criteriaEvaluationContext] = S.[criteriaEvaluationContext]
+					,[criteriaEvaluationContextTxt] = S.[criteriaEvaluationContextTxt]
 		WHEN NOT MATCHED BY SOURCE
 			THEN
 				DELETE
@@ -57,7 +67,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'dim_nsp_event_to_topic'
+			,'bridge_nsp_criteria_to_group'
 			,CURRENT_TIMESTAMP
 			,'SUCCESS'
 			,@ROW
@@ -81,7 +91,7 @@ BEGIN
 			)
 		VALUES (
 			'dm'
-			,'dim_nsp_event_to_topic'
+			,'bridge_nsp_criteria_to_group'
 			,CURRENT_TIMESTAMP
 			,'FAIL'
 			,NULL
@@ -92,3 +102,4 @@ BEGIN
 END
 GO
 
+EXEC dm.usp_merge_bridge_nsp_criteria_to_group;

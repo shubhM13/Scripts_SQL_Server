@@ -1,0 +1,4 @@
+EXEC dm.usp_merge_dim_nsc_entity_master;
+EXEC dm.usp_merge_dim_nsc_employee;
+EXEC dm.usp_merge_dim_assessment;
+EXEC dm.usp_merge_dim_fact_nsc_agronomist_performance;

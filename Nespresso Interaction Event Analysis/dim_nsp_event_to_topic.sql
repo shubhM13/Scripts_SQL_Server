@@ -18,7 +18,7 @@ AS
 (
 		SELECT DISTINCT B.eventId AS eventId
 			,ISNULL(D.label, 'N/A') AS topicName
-			,ISNULL(X.templateName, 'N/A') AS templateName
+			,ISNULL(X.templateName, 'N/A') AS templateName --redundant info
 		FROM [dwh].[IT_Event] AS A
         LEFT JOIN [dwh].[IT_EventToTopic] AS B
         ON B.eventId = A.eventId

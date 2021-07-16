@@ -1,0 +1,3 @@
+EXEC dm.usp_merge_dim_criteria;
+EXEC dm.usp_merge_dim_nsc_entity_master;
+EXEC dm.usp_merge_fact_nsc_adoption;
