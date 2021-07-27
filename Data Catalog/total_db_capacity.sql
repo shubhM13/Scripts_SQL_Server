@@ -1,0 +1,1 @@
+SELECT cast(DATABASEPROPERTYEX('glbl-dv-coffeeecosystem-id-euno-sqd', 'MaxSizeInBytes')As FLOAT)/(1024*1024*1024) AS DatabaseDataMaxSizeInBytes
