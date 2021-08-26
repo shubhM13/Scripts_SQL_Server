@@ -1,9 +1,8 @@
-/****** Object:  View [dm].[view_nsp_criteria]    Script Date: 31/05/2021 1:35:51 AM ******/
 SET ANSI_NULLS ON
 GO
-
 SET QUOTED_IDENTIFIER ON
 GO
+
 
 /*******************************************
  Author     : Shubham Mishra
@@ -61,9 +60,24 @@ AS
 			AND F.itemCode = A.classification2
 		LEFT JOIN [dm].[dim_list_option] AS G ON G.setId = 'CRITERIA_CLASS3'
 			AND G.itemCode = A.classification3
-		WHERE A.criteriaId IN (select distinct observationCriteriaId from [dm].[view_fact_assessment_analysis])
+		WHERE A.criteriaId IN (
+			select distinct observationCriteriaId 
+			from dm.dim_observation AS L
+			INNER JOIN dm.dim_interaction AS M
+			ON M.interactionId = L.interactionId
+		WHERE M.[interactionEmployeeId] NOT IN ('1104','708','697','976')
+		AND CAST(FORMAT(cast(L.obsDate AS DATE), 'yyyyMMdd') AS INT) IN (select distinct dateKey from [dm].[dim_date])
+		AND M.interactionOrganisationId IN (select distinct organisationId from dm.dim_nsp_organisation)
+		AND M.interactionTemplateId IN (select distinct templateId from [dm].[dim_nsp_template])
+		AND L.observationEntityId IN (select distinct entityId from dm.dim_nsp_entity_master)
+		AND M.interactionTemplateId IN (select distinct templateId from dm.dim_nsp_template)
+		AND M.interactionEmployeeId IN (select distinct employeeId from dm.dim_nsp_employee)
+			)
 		);
 GO
+
+
+select count(*) from [dm].[view_dim_nsp_criteria]
 
 
 

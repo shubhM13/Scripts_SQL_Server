@@ -1,0 +1,148 @@
+SELECT CASE 
+		WHEN GeoNode3."geoNodeType" = 'GLOBAL'
+			THEN GeoNode2."name"
+		ELSE GeoNode3."name"
+		END AS "Country"
+	,CASE 
+		WHEN GeoNode2."geoNodeType" = 'COUNTRY'
+			THEN GeoNode."name"
+		ELSE GeoNode2."name"
+		END AS "Cluster"
+	,CASE 
+		WHEN GeoNode."geoNodeType" = 'CLUSTER'
+			THEN ''
+		ELSE GeoNode."name"
+		END AS "Subcluster"
+	,Entity."entityType" AS "Entity Type"
+	,Entity."externalSystemId" AS "AAA ID"
+	,Entity."entityId" AS "ENTITYID"
+	,Entity."name" AS "Farm Name"
+	,Entity."status" AS "Farm Status"
+	,Entity."inactivatedOn" AS "Farm Inactivation Date"
+	,Entity."AAAEntryYear" AS "Farm Entry Year"
+	,Entity."AAAStatus" AS "AAA Status"
+	,Person."personInfo.firstName" || ' ' || Person."personInfo.lastName" AS "Primary Contact"
+	,Entity."coordinates.longX" AS "Longitude"
+	,Entity."coordinates.latY" AS "Latitude"
+	,Entity."altZ" AS "Altitude"
+	,Entity."locationVerified" AS "Location Verified"
+	,Entity."AAAEnrolmentDate" AS "AAA Enrollment Date"
+	,max(RESULT_TABLE."obsDateTime") AS "Last Update Observation"
+	,max(Entity."auditInfo.modifiedOn") AS "Last Update System"
+	
+FROM (
+	SELECT *
+	FROM (
+		SELECT Interaction."entityId"
+			,Interaction."interactionId"
+			,Interaction."status" "InteractionStatus"
+			,Interaction."startDate"
+			,Observation."status"
+			,Observation."obsDateTime"
+			,Observation."auditInfo.createdOn" "ObservationCreationDate"
+			,Observation."notApplicableFlag"
+			,Observation."answerType"
+			,Observation."answerCode"
+			,Observation."answerNumber"
+			,Criteria."externalId"
+			,CriteriaGroup."criteriaEvaluationContext"
+			,Criteria."answerListSetId"
+			,Criteria."classification1" AS "classification"
+			,Label1."label" AS "classification1"
+			,Label2."label" AS "classification2"
+			,UnitLabel."label"
+			,RANK() OVER (
+				PARTITION BY Interaction."entityId"
+				,Criteria."externalId" ORDER BY Observation."obsDateTime" DESC
+					,Observation."observationId" DESC
+				) AS ObsRank
+		FROM "FARMS"."nestle.dev.glb.farms.data.structure::IT.Interaction" AS Interaction
+		LEFT OUTER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::AT.Observation" AS Observation
+			ON Observation."interactionId" = Interaction."interactionId"
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::AT.Criteria" AS Criteria
+			ON Observation."criteriaId" = Criteria."criteriaId"
+		LEFT OUTER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::AT.CriteriaToCriteriaGroup" AS CriteriaGroup
+			ON Criteria."criteriaId" = CriteriaGroup."criteriaId"
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::AT.Criteria_Txt" AS Criteria_Text
+			ON Criteria_Text."criteriaId" = Criteria."criteriaId" AND Criteria_Text."language" = 'E'
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.ListOption_Txt" AS Label1
+			ON Label1."language" = 'E' AND Criteria."classification1" = Label1."itemCode" AND Label1."setId" = 'CRITERIA_CLASS1'
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.ListOption_Txt" AS Label2
+			ON Label2."language" = 'E' AND Criteria."classification2" = Label2."itemCode" AND Label2."setId" = 'CRITERIA_CLASS2'
+		LEFT JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.ListOption_Txt" AS Label3
+			ON Label3."language" = 'E' AND Criteria."classification3" = Label3."itemCode" AND Label3."setId" = 'CRITERIA_CLASS3'
+		LEFT JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.ListOption_Txt" AS UnitLabel
+			ON UnitLabel."language" = 'E' AND Observation."unitOfMeasure" = UnitLabel."itemCode" AND UnitLabel."setId" = 'UOM'
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.Employee" AS Employee
+			ON Employee."employeeId" = Interaction."employeeId"
+		INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.Organisation" AS Organisation
+			ON Employee."organisationId" = Organisation."organisationId"
+		WHERE Organisation."lineOfBusiness" = 'NESPRESSO' AND Interaction."status" != 'CANCELLED' AND Observation."status" = 'ACTIVE' AND CriteriaGroup."criteriaEvaluationContext" IN ('CORE', 'PRE-REQUISITE')
+		)
+	WHERE ObsRank = 1
+	) RESULT_TABLE
+RIGHT OUTER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::ET.Entity" AS Entity
+	ON RESULT_TABLE."entityId" = Entity."entityId"
+LEFT JOIN "FARMS"."nestle.dev.glb.farms.data.structure::ET.Person" AS Person
+	ON Person."entityId" = Entity."entityId" AND Person."primaryIndicator" = 1 AND Person."status" = 'ACTIVE'
+LEFT JOIN "_SYS_BIC"."nestle.dev.glb.farms.models.dataFoundation/EntityCalculations" AS EntityCalculations
+	ON EntityCalculations."entityId" = Entity."entityId"
+INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.GeoNode" AS GeoNode
+	ON GeoNode."geoNodeId" = Entity."geoNodeId"
+INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.GeoNode" AS GeoNode2
+	ON GeoNode."parentId" = GeoNode2."geoNodeId"
+INNER JOIN "FARMS"."nestle.dev.glb.farms.data.structure::CT.GeoNode" AS GeoNode3
+	ON GeoNode2."parentId" = GeoNode3."geoNodeId"
+WHERE GeoNode."lineOfBusiness" = 'NESPRESSO'
+GROUP BY CASE 
+		WHEN GeoNode3."geoNodeType" = 'GLOBAL'
+			THEN GeoNode2."name"
+		ELSE GeoNode3."name"
+		END
+	,CASE 
+		WHEN GeoNode2."geoNodeType" = 'COUNTRY'
+			THEN GeoNode."name"
+		ELSE GeoNode2."name"
+		END
+	,CASE 
+		WHEN GeoNode."geoNodeType" = 'CLUSTER'
+			THEN ''
+		ELSE GeoNode."name"
+		END
+	,Entity."entityType"
+	,Entity."externalSystemId"
+	,Entity."entityId"
+	,Entity."name"
+	,Entity."status"
+	,Entity."inactivatedOn"
+	,Entity."AAAEntryYear"
+	,Entity."AAAStatus"
+	,Person."personInfo.firstName" || ' ' || Person."personInfo.lastName"
+	,Entity."coordinates.longX"
+	,Entity."coordinates.latY"
+	,Entity."altZ"
+	,Entity."locationVerified"
+	,Entity."AAAEnrolmentDate"
+	,EntityCalculations."coffeeArea"
+	,EntityCalculations."totalArea"
+	,EntityCalculations."totalYield"
+	,EntityCalculations."totalProduction"
+	,EntityCalculations."arabicaProduction"
+	,EntityCalculations."robustaProduction"
+	,EntityCalculations."bourbonProduction"
+ORDER BY CASE 
+		WHEN GeoNode3."geoNodeType" = 'GLOBAL'
+			THEN GeoNode2."name"
+		ELSE GeoNode3."name"
+		END
+	,CASE 
+		WHEN GeoNode2."geoNodeType" = 'COUNTRY'
+			THEN GeoNode."name"
+		ELSE GeoNode2."name"
+		END
+	,CASE 
+		WHEN GeoNode."geoNodeType" = 'CLUSTER'
+			THEN ''
+		ELSE GeoNode."name"
+		END
+	,Entity."externalSystemId"

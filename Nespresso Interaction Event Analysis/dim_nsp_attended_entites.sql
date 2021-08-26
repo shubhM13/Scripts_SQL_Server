@@ -10,10 +10,9 @@ GO
  Created On : 22nd March, 2021
  PURPOSE    : EntityMaster Model for Nespresso
  Modified On: 20th April, 2021 for including MT.FarmSummary columns, removing nescafe specific columns and removing the itemCode columns
-
  *******************************************/
---DROP VIEW [dm].[view_dim_nsp_attended_entites];
-CREATE VIEW [dm].[view_dim_nsp_attended_entites]
+--DROP VIEW [dm].[view_dim_nsp_attended_entities];
+CREATE VIEW [dm].[view_dim_nsp_attended_entities]
 AS
 (
 		SELECT DISTINCT A.entityId AS entityId
@@ -94,23 +93,18 @@ GO
 
 
 
-drop table [dm].[dim_nsp_entity_master];
+drop table [dm].[dim_nsp_attended_entities];
 
 SELECT
   *
-INTO [dm].[dim_nsp_attended_entites]
-FROM [dm].[view_dim_nsp_attended_entites];
+INTO [dm].[dim_nsp_attended_entities]
+FROM [dm].[view_dim_nsp_attended_entities];
 
 
-ALTER TABLE [dm].[dim_nsp_attended_entites]
+ALTER TABLE [dm].[dim_nsp_attended_entities]
 ADD CONSTRAINT nspAttEntity_pk PRIMARY KEY (entityId);
 
-select count(*) from [dm].[view_nsp_entity_master];
-select * from [dm].[dim_nsp_entity_master];
-select distinct countryName from [dm].[dim_nsp_entity_master] order by countryName;
-select distinct countryName from dm.dim_nsp_geonode_flat where cluster IS NOT NULL OR subCluster IS NOT NULL
-select externalSystemId, count(*) from [dm].[dim_nsp_entity_master] group by externalSystemId
 
-select COUNT(*) from [dm].[dim_nsp_attended_entites]
+select COUNT(*) from [dm].[dim_nsp_attended_entities]
 select COUNT(*) from [dm].[dim_entity_master]
 

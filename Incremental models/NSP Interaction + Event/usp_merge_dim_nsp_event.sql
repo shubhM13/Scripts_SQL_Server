@@ -1,10 +1,11 @@
 /*******************************************
  Name 		: dm.usp_merge_dim_nsp_event
  Author     : Shubham Mishra
- Created On : 02, Jun, 2021
+ Created On : 28, Jul, 2021
  PURPOSE    : Data Model Incremental Setup
  *******************************************/
-ALTER PROCEDURE dm.usp_merge_dim_nsp_event (
+--drop procedure dm.usp_merge_dim_nsp_event
+CREATE PROCEDURE dm.usp_merge_dim_nsp_event (
 	@pipeline_name AS VARCHAR(100) = NULL
 	,@run_id AS VARCHAR(100) = NULL
 	)
@@ -27,11 +28,9 @@ BEGIN
 					,[eventName]
 					,[interactionStatus]
 					,[eventStatus]
-					,[interactionType]
 					,[eventType]
 					,[trainingFeedbackTaken]
 					,[eventOrgName]
-					,[eventDescription]
 					,[eventStartDate]
 					,[eventEndDate]
 					,[eventLocation]
@@ -40,9 +39,7 @@ BEGIN
 					,[employeeEmails]
 					,[attendanceTaken]
 					,[attendedPersonCount]
-					,[attendees]
 					,[topicCounts]
-					,[topics]
 					)
 				VALUES (
 					S.[eventId]
@@ -50,11 +47,9 @@ BEGIN
 					,S.[eventName]
 					,S.[interactionStatus]
 					,S.[eventStatus]
-					,S.[interactionType]
 					,S.[eventType]
 					,S.[trainingFeedbackTaken]
 					,S.[eventOrgName]
-					,S.[eventDescription]
 					,S.[eventStartDate]
 					,S.[eventEndDate]
 					,S.[eventLocation]
@@ -63,9 +58,7 @@ BEGIN
 					,S.[employeeEmails]
 					,S.[attendanceTaken]
 					,S.[attendedPersonCount]
-					,S.[attendees]
 					,S.[topicCounts]
-					,S.[topics]
 					)
 		WHEN MATCHED
 			THEN
@@ -74,11 +67,9 @@ BEGIN
 					,[eventName] = S.[eventName]
 					,[interactionStatus] = S.[interactionStatus]
 					,[eventStatus] = S.[eventStatus]
-					,[interactionType] = S.[interactionType]
 					,[eventType] = S.[eventType]
 					,[trainingFeedbackTaken] = S.[trainingFeedbackTaken]
 					,[eventOrgName] = S.[eventOrgName]
-					,[eventDescription] = S.[eventDescription]
 					,[eventStartDate] = S.[eventStartDate]
 					,[eventEndDate] = S.[eventEndDate]
 					,[eventLocation] = S.[eventLocation]
@@ -87,9 +78,7 @@ BEGIN
 					,[employeeEmails] = S.[employeeEmails]
 					,[attendanceTaken] = S.[attendanceTaken]
 					,[attendedPersonCount] = S.[attendedPersonCount]
-					,[attendees] = S.[attendees]
 					,[topicCounts] = S.[topicCounts]
-					,[topics] = S.[topics]
 		WHEN NOT MATCHED BY SOURCE
 			THEN
 				DELETE
@@ -147,4 +136,3 @@ BEGIN
 END
 GO
 
-EXEC dm.usp_merge_dim_nsp_event;

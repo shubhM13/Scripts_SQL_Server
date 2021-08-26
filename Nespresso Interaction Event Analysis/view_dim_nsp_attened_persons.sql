@@ -11,8 +11,8 @@ GO
  PURPOSE    : Event Analysis
  Modified By: Shubham Mishra On 13th May // Event Analysis Nescafe
  *******************************************/
---drop view [dm].[view_dim_nsp_attented_persons]
-CREATE VIEW [dm].[view_dim_nsp_attened_persons]
+--drop view [dm].[view_dim_nsp_attended_persons]
+CREATE VIEW [dm].[view_dim_nsp_attended_persons]
 AS
 (
 		SELECT DISTINCT A.personId AS personId
@@ -67,10 +67,10 @@ AS
 		);
 GO
 
-drop table [dm].[view_dim_nsp_attened_persons];
+drop table [dm].[dim_nsp_attended_persons];
 
 select * 
-into [dm].[dim_nsp_attened_persons]
-from [dm].[view_dim_nsp_attened_persons];
+into [dm].[dim_nsp_attended_persons]
+from [dm].[view_dim_nsp_attended_persons];
 
-ALTER TABLE [dm].[dim_nsp_attened_persons] ADD CONSTRAINT dimNspAttPerson_pk PRIMARY KEY (personId);
+ALTER TABLE [dm].[dim_nsp_attended_persons] ADD CONSTRAINT dimNspAttPerson_pk PRIMARY KEY (personId);

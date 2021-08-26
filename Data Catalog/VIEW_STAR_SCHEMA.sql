@@ -1,8 +1,10 @@
+/****** Object:  View [AUDIT].[VIEW_STAR_SCHEMA]    Script Date: 09-08-2021 14:21:10 ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
+
 
 /*******************************************
  Author     : Shubham Mishra
@@ -12,9 +14,11 @@ GO
 --drop view [AUDIT].[VIEW_STAR_SCHEMA]		
 CREATE VIEW [AUDIT].[VIEW_STAR_SCHEMA]
 AS
-(		SELECT 'dbo.' + dig.name AS star_schema
+(		SELECT	distinct diagram_id
+				,'dbo.' + dig.name AS star_schema
+				,map.ref_table_id
 				,map.ref_table
-		FROM [dbo].[sysdiagrams] AS dig
+		FROM [AUDIT].[SYSDIAGRAMS] AS dig
 		INNER JOIN 
 		(SELECT DISTINCT tab1.object_id AS [fact_table_id]
 			,sch.name + '.' + tab1.name AS [fact_table]
@@ -35,5 +39,13 @@ AS
 		where name like '%fact%') map
 		ON map.fact_table LIKE '%'+dig.name+'%'
 		);
+GO
 
 select * from [AUDIT].[VIEW_STAR_SCHEMA];
+
+DROP TABLE [AUDIT].[SYSDIAGRAMS];
+
+SELECT *
+INTO [AUDIT].[SYSDIAGRAMS]
+FROM [dbo].[sysdiagrams];
+
