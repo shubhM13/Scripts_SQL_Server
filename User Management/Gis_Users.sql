@@ -9,12 +9,21 @@ GO
 
 
 ----------------------------------------- CREATE USER IN MASTER & FARMS DB ----------------------------------------------------------------------
+USE [master];
 CREATE USER farms_gis_user
 FOR LOGIN farms_gis_user
 GO
 
 CREATE USER sde
 FOR LOGIN sde
+GO
+
+USE [glbldvcoffeeecosystemideunosqd];
+
+CREATE USER [sde] FOR LOGIN [sde] WITH DEFAULT_SCHEMA=[sde]
+GO
+
+CREATE USER [sde] FOR LOGIN [sde] WITH DEFAULT_SCHEMA=[sde]
 GO
 
 
@@ -104,8 +113,9 @@ GO
 
 -----------------------------------------------Grant Create Permission to sde and gis users on their own schema ------------------------------
 
-GRANT CREATE TABLE, CREATE VIEW, CREATE FUNCTION, CREATE PROCEDURE TO sde;
+GRANT CREATE TABLE, CREATE VIEW, CREATE FUNCTION, CREATE PROCEDURE, VIEW DATABASE STATE TO sde;
 GO
+
 
 GRANT CREATE TABLE, CREATE VIEW, CREATE FUNCTION, CREATE PROCEDURE TO farms_gis_user;
 GO
@@ -165,3 +175,22 @@ CREATE TABLE gis.students (
 DROP TABLE gis.students;
 
 select top(10)* from dm.dim_entity_master;
+
+--------------------------------------------------------
+-- TO Check Default Schema
+SELECT *
+FROM sys.database_principals 
+WHERE type = 'S' and name IN ('sde', 'farms_gis_user');
+
+
+-- To Alter Default Schema
+ALTER USER sde WITH DEFAULT_SCHEMA = sde;
+GO
+ALTER USER farms_gis_user WITH DEFAULT_SCHEMA = gis;
+GO
+
+--To Check Owned Schema
+SELECT db.name AS [DB User], s.name AS [Schema]
+FROM sys.database_principals db
+JOIN sys.schemas s ON s.principal_id = db.principal_id
+where db.name IN ('sde', 'farms_gis_user')
