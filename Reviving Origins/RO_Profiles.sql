@@ -36,16 +36,16 @@ AS
 			WHERE AT.rnk = 1
 );
 
-drop table [dm].[dim_nsp_ro_farmer_profiles];
+drop table [aaa].[dim_nsp_ro_farmer_profiles];
 
 select *
-INTO [dm].[dim_nsp_ro_farmer_profiles]
+INTO [aaa].[dim_nsp_ro_farmer_profiles]
 from [dm].[view_dim_nsp_ro_farmer_profiles];
 
-ALTER TABLE [dm].[dim_nsp_ro_farmer_profiles] ALTER COLUMN owningRecordId VARCHAR(50) NOT NULL;
-ALTER TABLE [dm].[dim_nsp_ro_farmer_profiles] ADD CONSTRAINT pk_nsp_ro_farmer_profiles PRIMARY KEY(owningRecordId);
+ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ALTER COLUMN owningRecordId VARCHAR(50) NOT NULL;
+ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ADD CONSTRAINT pk_nsp_ro_farmer_profiles PRIMARY KEY(owningRecordId);
 
-select * from [dm].[dim_nsp_ro_farmer_profiles];
+select * from [aaa].[dim_nsp_ro_farmer_profiles];
 
 
 

@@ -42,16 +42,16 @@ AS
 			WHERE p2.rnk = 1
 );
 
-drop table [dm].[dim_nsp_ro_persons];
+drop table [aaa].[dim_nsp_ro_persons];
 
 select *
-INTO [dm].[dim_nsp_ro_persons]
+INTO [aaa].[dim_nsp_ro_persons]
 from [dm].[view_dim_nsp_ro_persons];
 
-ALTER TABLE [dm].[dim_nsp_ro_persons] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
-ALTER TABLE [dm].[dim_nsp_ro_persons] ADD CONSTRAINT pk_nsp_ro_persons PRIMARY KEY(entityId);
+ALTER TABLE [aaa].[dim_nsp_ro_persons] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
+ALTER TABLE [aaa].[dim_nsp_ro_persons] ADD CONSTRAINT pk_nsp_ro_persons PRIMARY KEY(entityId);
 
-select * from [dm].[dim_nsp_ro_persons];
+select * from [aaa].[dim_nsp_ro_persons];
 
 
 

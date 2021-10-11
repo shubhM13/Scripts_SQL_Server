@@ -55,17 +55,17 @@ GO
 
 select * from [dm].[view_fact_nsp_reviving_origins];
 
-drop table [dm].[fact_nsp_reviving_origins];
+drop table [aaa].[fact_nsp_reviving_origins];
 
 select * 
-into [dm].[fact_nsp_reviving_origins]
+into [aaa].[fact_nsp_reviving_origins]
 from [dm].[view_fact_nsp_reviving_origins];
 
-ALTER TABLE [dm].[fact_nsp_reviving_origins]
+ALTER TABLE [aaa].[fact_nsp_reviving_origins]
 ADD CONSTRAINT pk_fact_ro PRIMARY KEY (deliveryNumber);
 
 select * 
-from [dm].[fact_nsp_reviving_origins]
+from [aaa].[fact_nsp_reviving_origins]
 where deliveryNumber = '246239C0A88C0B9F1700C600E7D00069';
 
 select count(*) from [dm].[view_fact_nsp_reviving_origins];

@@ -63,16 +63,16 @@ AS
 			LEFT JOIN dm.dim_geonode_flat AS Geo ON Entity.geonodeId = Geo.geoNodeId
 );
 
-drop table [dm].[dim_nsp_ro_entity];
+drop table [aaa].[dim_nsp_ro_entity];
 
 select *
-INTO [dm].[dim_nsp_ro_entity]
+INTO [aaa].[dim_nsp_ro_entity]
 from [dm].[view_dim_nsp_ro_entity];
 
-ALTER TABLE [dm].[dim_nsp_ro_entity] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
-ALTER TABLE [dm].[dim_nsp_ro_entity] ADD CONSTRAINT pk_nsp_ro_entity PRIMARY KEY(entityId);
+ALTER TABLE [aaa].[dim_nsp_ro_entity] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
+ALTER TABLE [aaa].[dim_nsp_ro_entity] ADD CONSTRAINT pk_nsp_ro_entity PRIMARY KEY(entityId);
 
-select * from [dm].[dim_nsp_ro_entity];
+select * from [aaa].[dim_nsp_ro_entity];
 
 
 

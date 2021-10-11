@@ -36,14 +36,14 @@ AS
 			WHERE Interaction.rnk = 1
 );
 
-drop table [dm].[dim_nsp_ro_last_interaction];
+drop table [aaa].[dim_nsp_ro_last_interaction];
 
 select *
-INTO [dm].[dim_nsp_ro_last_interaction]
+INTO [aaa].[dim_nsp_ro_last_interaction]
 from [dm].[view_dim_nsp_ro_last_interaction];
 
-ALTER TABLE [dm].[dim_nsp_ro_last_interaction] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
-ALTER TABLE [dm].[dim_nsp_ro_last_interaction] ADD CONSTRAINT pk_nsp_ro_last_interaction PRIMARY KEY(entityId);
+ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
+ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ADD CONSTRAINT pk_nsp_ro_last_interaction PRIMARY KEY(entityId);
 
 select entityId, count(*)
 from [dm].[dim_nsp_ro_last_interaction]
