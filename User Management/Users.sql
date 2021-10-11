@@ -137,6 +137,10 @@ DENY SELECT
 	TO farms_aaa_user;
 
 DENY SELECT 
+	ON SCHEMA::AUDIT 
+	TO farms_aaa_user;
+
+DENY SELECT 
 	ON SCHEMA::sys 
 	TO farms_aaa_user;
 
@@ -146,10 +150,6 @@ DENY SELECT
 
 DENY SELECT 
 	ON SCHEMA::dbo 
-	TO farms_aaa_user;
-
-DENY SELECT 
-	ON SCHEMA::AUDIT 
 	TO farms_aaa_user;
 -----------------------------------------------Grant Create Permission to sde and gis users on their own schema ------------------------------
 

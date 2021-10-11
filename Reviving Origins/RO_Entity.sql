@@ -13,7 +13,7 @@ GO
 CREATE VIEW [dm].[view_dim_nsp_ro_entity]
 AS
 (
-			SELECT distinct Entity.entityId
+			SELECT distinct O.entityId
 				,Entity.externalSystemId
 				,Entity.name
 				,Entity.entityType
@@ -54,7 +54,7 @@ AS
 				,Entity.[addressInfo.countryCode] AS addressInfo_countryCode
 				,Entity.[addressInfo.zipcode] AS addressInfo_zipcode
 			FROM [dwh].[OT_Delivery] AS O 
-			INNER JOIN [dwh].[ET_Entity] AS Entity 
+			LEFT JOIN [dwh].[ET_Entity] AS Entity 
 			ON O.entityId = Entity.entityId
 			AND O.lineOfBusiness IN (
 				'NESPRESSO'

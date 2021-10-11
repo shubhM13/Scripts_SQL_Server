@@ -15,7 +15,7 @@ AS
 (
 			SELECT *
 			FROM (
-				SELECT distinct A.owningRecordId 
+				SELECT distinct O.entityId 
 				    ,A.attachmentId
 					,A.binaryObject
 					,A.mimeType
@@ -27,7 +27,7 @@ AS
 							,attachmentId DESC
 						) AS rnk
 				FROM [dwh].[OT_Delivery] AS O
-				INNER JOIN [dwh].[CT_Attachment] AS A
+				LEFT JOIN [dwh].[CT_Attachment] AS A
 				ON O.entityId = A.owningRecordId
 				AND A.owningRecordType = 'ENTITY'
 				AND A.primaryIndicator = 1
@@ -42,8 +42,8 @@ select *
 INTO [aaa].[dim_nsp_ro_farmer_profiles]
 from [dm].[view_dim_nsp_ro_farmer_profiles];
 
-ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ALTER COLUMN owningRecordId VARCHAR(50) NOT NULL;
-ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ADD CONSTRAINT pk_nsp_ro_farmer_profiles PRIMARY KEY(owningRecordId);
+ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
+ALTER TABLE [aaa].[dim_nsp_ro_farmer_profiles] ADD CONSTRAINT pk_nsp_ro_farmer_profiles PRIMARY KEY(entityId);
 
 select * from [aaa].[dim_nsp_ro_farmer_profiles];
 

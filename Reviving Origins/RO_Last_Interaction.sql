@@ -12,7 +12,13 @@ GO
 --drop view dm.[view_dim_nsp_ro_last_interaction]
 CREATE VIEW [dm].[view_dim_nsp_ro_last_interaction]
 AS
-(
+(			
+			SELECT distinct A.entityId
+				  ,Int.lastInteractionDate
+				  ,Int.lastInteractionStatus
+				  ,Int.lastInteractionType
+			FROM [dwh].[OT_Delivery] AS A
+			LEFT JOIN (
 			SELECT *
 			FROM (
 				SELECT distinct I.entityId
@@ -23,17 +29,15 @@ AS
 						PARTITION BY I.entityId ORDER BY I.[auditInfo.modifiedOn] DESC
 						) AS rnk
 				FROM [dwh].[IT_Interaction] AS I
-				INNER JOIN [dwh].[OT_Delivery] AS J
-				ON I.entityId = J.entityId
-				AND J.lineOfBusiness IN ('GLOBAL', 'NESPRESSO')
-				AND I.STATUS NOT IN (
+				WHERE I.STATUS NOT IN (
 						'CANCELLED'
 						,'DELETED'
 						,'PLANNED'
 						)
-				AND J.entityId IS NOT NULL
+				AND I.entityId IS NOT NULL
 				) AS Interaction
-			WHERE Interaction.rnk = 1
+			WHERE Interaction.rnk = 1)
+			AS Int ON A.entityId = Int.entityId
 );
 
 drop table [aaa].[dim_nsp_ro_last_interaction];
@@ -46,7 +50,7 @@ ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ALTER COLUMN entityId VARCHAR(50
 ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ADD CONSTRAINT pk_nsp_ro_last_interaction PRIMARY KEY(entityId);
 
 select entityId, count(*)
-from [dm].[dim_nsp_ro_last_interaction]
+from [aaa].[dim_nsp_ro_last_interaction]
 group by entityId
 having count(*) > 1
 
