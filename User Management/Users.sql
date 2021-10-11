@@ -7,6 +7,9 @@ CREATE LOGIN sde
 	WITH PASSWORD = 'Esri4Farms@2021'
 GO
 
+CREATE LOGIN farms_aaa_user
+	WITH PASSWORD = 'CoffeeDatalake@2021'
+GO
 
 ----------------------------------------- CREATE USER IN MASTER & FARMS DB ----------------------------------------------------------------------
 USE [master];
@@ -18,14 +21,20 @@ CREATE USER sde
 FOR LOGIN sde
 GO
 
+CREATE USER farms_aaa_user
+FOR LOGIN farms_aaa_user
+GO
+
 USE [glbldvcoffeeecosystemideunosqd];
 
 CREATE USER [sde] FOR LOGIN [sde] WITH DEFAULT_SCHEMA=[sde]
 GO
 
-CREATE USER [sde] FOR LOGIN [sde] WITH DEFAULT_SCHEMA=[sde]
+CREATE USER [farms_gis_user] FOR LOGIN [farms_gis_user] WITH DEFAULT_SCHEMA=[gis]
 GO
 
+CREATE USER [farms_aaa_user] FOR LOGIN [farms_aaa_user] WITH DEFAULT_SCHEMA=[aaa]
+GO
 
 ---------------------------------------Create SDE schema and grant select permission on other schema to sde user------------------------------
 CREATE SCHEMA sde AUTHORIZATION sde
@@ -110,7 +119,38 @@ GRANT SELECT
 	TO farms_gis_user
 GO
 
+----------------------------------Create AAA Schema & Grant Select Permissions to AAA User -------------------------------------
+drop schema aaa;
 
+CREATE SCHEMA aaa AUTHORIZATION farms_aaa_user
+
+DENY SELECT 
+	ON SCHEMA::dm 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::dwh 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::stg 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::sys 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::INFORMATION_SCHEMA 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::dbo 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::AUDIT 
+	TO farms_aaa_user;
 -----------------------------------------------Grant Create Permission to sde and gis users on their own schema ------------------------------
 
 GRANT CREATE TABLE, CREATE VIEW, CREATE FUNCTION, CREATE PROCEDURE, VIEW DATABASE STATE TO sde;
