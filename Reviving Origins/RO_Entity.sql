@@ -10,7 +10,7 @@ GO
  PURPOSE    : Reviving Model Nespresso
  *******************************************/
 --drop view dm.[view_dim_nsp_ro_entity]
-CREATE VIEW [dm].[view_dim_nsp_ro_entity]
+ALTER VIEW [dm].[view_dim_nsp_ro_entity]
 AS
 (
 			SELECT distinct O.entityId
@@ -37,9 +37,9 @@ AS
 						THEN CAST(1 AS BIT)
 					ELSE CAST(0 AS BIT)
 					END AS isValidCoordinates
-				,Geo.country_name AS subClusterName
+				,Geo.sub_cluster_name AS subClusterName
 				,Geo.cluster_name AS clusterName
-				,Geo.sub_cluster_name AS countryName
+				,Geo.country_name AS countryName
 				,Entity.STATUS
 				,Entity.AAAEntryYear
 				,Entity.AAAEnrolmentDate
@@ -53,14 +53,33 @@ AS
 				,Entity.[addressInfo.province] AS addressInfo_province
 				,Entity.[addressInfo.countryCode] AS addressInfo_countryCode
 				,Entity.[addressInfo.zipcode] AS addressInfo_zipcode
+				,E.numberOfPlots
+				,E.totalPlotArea
+				,E.areaUoM AS plotAreaUoM
+				,G.[Farm Area (Ha)]
+				,G.[Coffee Area (Ha)]
+				,E.totalNumberOfTrees
+				,E.avgNumberOfStemsPerTree
+				,E.avgRenovationPercent
+				,E.avgReplantPercent
+				,E.avgRejunvenationPercent
+				,E.averageAge
+				,E.avgTreesDensity
+				,F.varietyDetails
 			FROM [dwh].[OT_Delivery] AS O 
-			LEFT JOIN [dwh].[ET_Entity] AS Entity 
+			INNER JOIN [dwh].[ET_Entity] AS Entity 
 			ON O.entityId = Entity.entityId
+			AND Entity.status = 'ACTIVE'
 			AND O.lineOfBusiness IN (
 				'NESPRESSO'
 				,'GLOBAL'
 				)
-			LEFT JOIN dm.dim_geonode_flat AS Geo ON Entity.geonodeId = Geo.geoNodeId
+			INNER JOIN dm.dim_geonode_flat AS Geo ON Entity.geonodeId = Geo.geoNodeId
+			AND Geo.country_name IN ('Uganda', 'Zimbabwe')
+			LEFT JOIN [dm].[view_dim_entity_plot_summary] AS E ON Entity.entityId = E.entityId
+			LEFT JOIN [dm].[view_dim_entity_variety_details] AS F ON Entity.entityId = F.entityId
+			LEFT JOIN [dm].[view_fact_entity_metrics_summary] AS G ON Entity.entityId = G.entityId
+				AND G.isLatest = 1
 );
 
 drop table [aaa].[dim_nsp_ro_entity];
@@ -72,7 +91,8 @@ from [dm].[view_dim_nsp_ro_entity];
 ALTER TABLE [aaa].[dim_nsp_ro_entity] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
 ALTER TABLE [aaa].[dim_nsp_ro_entity] ADD CONSTRAINT pk_nsp_ro_entity PRIMARY KEY(entityId);
 
-select * from [aaa].[dim_nsp_ro_entity];
+select count(*) from [aaa].[dim_nsp_ro_entity]; --2034
+select count(*) from [dm].[view_dim_nsp_ro_entity]; --2034
 
 
 

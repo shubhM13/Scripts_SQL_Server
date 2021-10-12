@@ -27,6 +27,15 @@ AS
 				   ,p2.personInfo_maritalStatus
 				   ,p2.livesAt
 			FROM [dwh].[OT_Delivery] AS A
+			INNER JOIN [dwh].[ET_Entity] AS Entity 
+			ON A.entityId = Entity.entityId
+			AND Entity.status = 'ACTIVE'
+			AND A.lineOfBusiness IN (
+				'NESPRESSO'
+				,'GLOBAL'
+				)
+			INNER JOIN dm.dim_geonode_flat AS Geo ON Entity.geonodeId = Geo.geoNodeId
+			AND Geo.country_name IN ('Uganda', 'Zimbabwe')
 			LEFT JOIN (
 			select * from(
 				SELECT P1.entityId 
@@ -62,7 +71,8 @@ from [dm].[view_dim_nsp_ro_persons];
 ALTER TABLE [aaa].[dim_nsp_ro_persons] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
 ALTER TABLE [aaa].[dim_nsp_ro_persons] ADD CONSTRAINT pk_nsp_ro_persons PRIMARY KEY(entityId);
 
-select * from [aaa].[dim_nsp_ro_persons];
+select count(*) from [aaa].[dim_nsp_ro_persons]; --2034
+select count(*) from [dm].[view_dim_nsp_ro_persons]; --2034
 
 
 

@@ -18,6 +18,15 @@ AS
 				  ,Int.lastInteractionStatus
 				  ,Int.lastInteractionType
 			FROM [dwh].[OT_Delivery] AS A
+			INNER JOIN [dwh].[ET_Entity] AS Entity 
+			ON A.entityId = Entity.entityId
+			AND Entity.status = 'ACTIVE'
+			AND A.lineOfBusiness IN (
+				'NESPRESSO'
+				,'GLOBAL'
+				)
+			INNER JOIN dm.dim_geonode_flat AS Geo ON Entity.geonodeId = Geo.geoNodeId
+			AND Geo.country_name IN ('Uganda', 'Zimbabwe')
 			LEFT JOIN (
 			SELECT *
 			FROM (
@@ -49,9 +58,7 @@ from [dm].[view_dim_nsp_ro_last_interaction];
 ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ALTER COLUMN entityId VARCHAR(50) NOT NULL;
 ALTER TABLE [aaa].[dim_nsp_ro_last_interaction] ADD CONSTRAINT pk_nsp_ro_last_interaction PRIMARY KEY(entityId);
 
-select entityId, count(*)
-from [aaa].[dim_nsp_ro_last_interaction]
-group by entityId
-having count(*) > 1
+select count(*) from [aaa].[dim_nsp_ro_last_interaction]; --2034
+select count(*) from [dm].[view_dim_nsp_ro_last_interaction]; --2034
 
 

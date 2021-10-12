@@ -120,9 +120,24 @@ GRANT SELECT
 GO
 
 ----------------------------------Create AAA Schema & Grant Select Permissions to AAA User -------------------------------------
-drop schema aaa;
+CREATE SCHEMA aaa;
 
-CREATE SCHEMA aaa AUTHORIZATION farms_aaa_user
+GRANT SELECT 
+	ON SCHEMA::aaa 
+	TO farms_aaa_user;
+
+ALTER ROLE db_datareader ADD MEMBER farms_aaa_user
+GO
+exec sp_addrolemember db_datareader, farms_aaa_user 
+go
+
+DENY SELECT 
+	ON SCHEMA::sde 
+	TO farms_aaa_user;
+
+DENY SELECT 
+	ON SCHEMA::gis 
+	TO farms_aaa_user;
 
 DENY SELECT 
 	ON SCHEMA::dm 
@@ -141,16 +156,9 @@ DENY SELECT
 	TO farms_aaa_user;
 
 DENY SELECT 
-	ON SCHEMA::sys 
-	TO farms_aaa_user;
-
-DENY SELECT 
-	ON SCHEMA::INFORMATION_SCHEMA 
-	TO farms_aaa_user;
-
-DENY SELECT 
 	ON SCHEMA::dbo 
 	TO farms_aaa_user;
+
 -----------------------------------------------Grant Create Permission to sde and gis users on their own schema ------------------------------
 
 GRANT CREATE TABLE, CREATE VIEW, CREATE FUNCTION, CREATE PROCEDURE, VIEW DATABASE STATE TO sde;
