@@ -116,3 +116,6 @@ SELECT
   ) THEN afterUnitConversaion ELSE 0 END AS bourbonProduction 
 FROM 
   cte;
+
+  --NFPR2
+  --NFPR1

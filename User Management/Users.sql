@@ -11,6 +11,10 @@ CREATE LOGIN farms_aaa_user
 	WITH PASSWORD = 'CoffeeDatalake@2021'
 GO
 
+CREATE LOGIN farms_opensc_user
+	WITH PASSWORD = 'AzureDatalake4Coffee@2021'
+GO
+
 ----------------------------------------- CREATE USER IN MASTER & FARMS DB ----------------------------------------------------------------------
 USE [master];
 CREATE USER farms_gis_user
@@ -25,6 +29,10 @@ CREATE USER farms_aaa_user
 FOR LOGIN farms_aaa_user
 GO
 
+CREATE USER farms_opensc_user
+FOR LOGIN farms_opensc_user
+GO
+
 USE [glbldvcoffeeecosystemideunosqd];
 
 CREATE USER [sde] FOR LOGIN [sde] WITH DEFAULT_SCHEMA=[sde]
@@ -34,6 +42,9 @@ CREATE USER [farms_gis_user] FOR LOGIN [farms_gis_user] WITH DEFAULT_SCHEMA=[gis
 GO
 
 CREATE USER [farms_aaa_user] FOR LOGIN [farms_aaa_user] WITH DEFAULT_SCHEMA=[aaa]
+GO
+
+CREATE USER [farms_opensc_user] FOR LOGIN [farms_opensc_user] WITH DEFAULT_SCHEMA=[opensc]
 GO
 
 ---------------------------------------Create SDE schema and grant select permission on other schema to sde user------------------------------
@@ -158,6 +169,51 @@ DENY SELECT
 DENY SELECT 
 	ON SCHEMA::dbo 
 	TO farms_aaa_user;
+
+
+----------------------------------Create AAA Schema & Grant Select Permissions to AAA User -------------------------------------
+CREATE SCHEMA opensc;
+
+GRANT SELECT 
+	ON SCHEMA::opensc 
+	TO farms_opensc_user;
+
+ALTER ROLE db_datareader ADD MEMBER farms_opensc_user
+GO
+exec sp_addrolemember db_datareader, farms_opensc_user 
+go
+
+DENY SELECT 
+	ON SCHEMA::sde 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::gis 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::dm 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::dwh 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::stg 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::AUDIT 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::dbo 
+	TO farms_opensc_user;
+
+DENY SELECT 
+	ON SCHEMA::aaa 
+	TO farms_opensc_user;
 
 -----------------------------------------------Grant Create Permission to sde and gis users on their own schema ------------------------------
 
